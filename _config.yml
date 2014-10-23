@@ -2,10 +2,10 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://yoursite.com
-title: My Octopress Blog
-subtitle: A blogging framework for hackers.
-author: Your Name
+url: http://peter.eisentraut.org
+title: Peter Eisentraut
+subtitle: professional automator
+author: Peter Eisentraut
 simple_search: https://www.google.com/search
 description:
 
