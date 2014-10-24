@@ -95,7 +95,7 @@ disqus_short_name: peter-eisentraut-org
 disqus_show_comment_count: true
 
 # Google Analytics
-google_analytics_tracking_id:
+google_analytics_tracking_id: UA-50941261-1
 
 # Facebook Like
 facebook_like: false
