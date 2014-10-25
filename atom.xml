@@ -4,7 +4,7 @@
   <title><![CDATA[Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2014-10-25T14:36:15-04:00</updated>
+  <updated>2014-10-25T14:59:56-04:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -12,5 +12,14 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[First post]]></title>
+    <link href="http://peter.eisentraut.org/blog/2014/10/25/first-post/"/>
+    <updated>2014-10-25T14:47:42-04:00</updated>
+    <id>http://peter.eisentraut.org/blog/2014/10/25/first-post</id>
+    <content type="html"><![CDATA[<p>This is my new blog.  My old blog was <a href="http://petereisentraut.blogspot.com/">here</a>, but it was time to move on.</p>
+]]></content>
+  </entry>
   
 </feed>
