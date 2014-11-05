@@ -9,8 +9,7 @@
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="This is my new blog. My old blog was here, but it was time to move on.
-">
+  <meta name="description" content="Whitespace matters. Git has support for checking whitespace in patches. git apply and git am have the option --whitespace, which can be used to warn &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,7 +84,73 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/10/25/first-post/">First post</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/11/04/checking-whitespace-with-git">Checking whitespace with Git</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-11-04T20:00:00-05:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:00 pm</span></time>
+        
+           | <a href="/blog/2014/11/04/checking-whitespace-with-git#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://blog.codinghorror.com/whitespace-the-silent-killer/">Whitespace matters</a>.</p>
+
+<p>Git has support for checking whitespace in patches.  <code>git apply</code> and <code>git am</code> have the option <code>--whitespace</code>, which can be used to warn or error about whitespace errors in the patches about to be applied. <code>git diff</code> has the option <code>--check</code> to check a change for whitespace errors.</p>
+
+<p>But all this assumes that your existing code is cool, and only new changes are candidates for problems.  Curiously, it is a bit hard to use those same tools for going back and checking whether an existing tree satisfies the whitespace rules applied to new patches.</p>
+
+<p>The core of the whitespace checking is in <code>git diff-tree</code>.  With the <code>--check</code> option, you can check the whitespace in the diff between two objects.</p>
+
+<p>But how do you check the whitespace of a tree rather than a diff?  Basically, you want</p>
+
+<pre><code>git diff-tree --check EMPTY HEAD
+</code></pre>
+
+<p>except there is no <code>EMPTY</code>.  But you can compute the hash of an empty Git tree:</p>
+
+<pre><code>git hash-object -t tree /dev/null
+</code></pre>
+
+<p>So the full command is</p>
+
+<pre><code>git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
+</code></pre>
+
+<p>If have this as an alias in my <code>~/.gitconfig</code>:</p>
+
+<pre><code>[alias]
+    check-whitespace = !git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
+</code></pre>
+
+<p>Then running</p>
+
+<pre><code>git check-whitespace
+</code></pre>
+
+<p>can be as easy as running <code>make</code> or <code>git commit</code>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/10/25/first-post">First post</a></h1>
     
     
       <p class="meta">
@@ -96,8 +161,8 @@
 
 <time class='entry-date' datetime='2014-10-25T14:47:42-04:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:47 pm</span></time>
         
-           | <a href="/blog/2014/10/25/first-post/#disqus_thread"
-             data-disqus-identifier="http://peter.eisentraut.org/blog/2014/10/25/first-post/">Comments</a>
+           | <a href="/blog/2014/10/25/first-post#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org/blog/2014/10/25/first-post">Comments</a>
         
       </p>
     
@@ -125,7 +190,11 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/10/25/first-post/">First post</a>
+        <a href="/blog/2014/11/04/checking-whitespace-with-git">Checking whitespace with Git</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/10/25/first-post">First post</a>
       </li>
     
   </ul>
