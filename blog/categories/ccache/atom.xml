@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: planet debian | Peter Eisentraut]]></title>
-  <link href="http://peter.eisentraut.org/blog/categories/planet-debian/atom.xml" rel="self"/>
+  <title><![CDATA[Category: ccache | Peter Eisentraut]]></title>
+  <link href="http://peter.eisentraut.org/blog/categories/ccache/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
   <updated>2014-12-01T20:28:37-05:00</updated>
   <id>http://peter.eisentraut.org/</id>
@@ -161,49 +161,6 @@ colored output of <code>clang</code>, and I suggested workarounds.  This was
 actually fixed in ccache 3.2, so the workarounds are no longer
 necessary, and the above configuration change is really the only thing
 to make Clang work smoothly with ccache.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Checking whitespace with Git]]></title>
-    <link href="http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git"/>
-    <updated>2014-11-04T20:00:00-05:00</updated>
-    <id>http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git</id>
-    <content type="html"><![CDATA[<p><a href="http://blog.codinghorror.com/whitespace-the-silent-killer/">Whitespace matters</a>.</p>
-
-<p>Git has support for checking whitespace in patches.  <code>git apply</code> and <code>git am</code> have the option <code>--whitespace</code>, which can be used to warn or error about whitespace errors in the patches about to be applied. <code>git diff</code> has the option <code>--check</code> to check a change for whitespace errors.</p>
-
-<p>But all this assumes that your existing code is cool, and only new changes are candidates for problems.  Curiously, it is a bit hard to use those same tools for going back and checking whether an existing tree satisfies the whitespace rules applied to new patches.</p>
-
-<p>The core of the whitespace checking is in <code>git diff-tree</code>.  With the <code>--check</code> option, you can check the whitespace in the diff between two objects.</p>
-
-<p>But how do you check the whitespace of a tree rather than a diff?  Basically, you want</p>
-
-<pre><code>git diff-tree --check EMPTY HEAD
-</code></pre>
-
-<p>except there is no <code>EMPTY</code>.  But you can compute the hash of an empty Git tree:</p>
-
-<pre><code>git hash-object -t tree /dev/null
-</code></pre>
-
-<p>So the full command is</p>
-
-<pre><code>git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
-</code></pre>
-
-<p>If have this as an alias in my <code>~/.gitconfig</code>:</p>
-
-<pre><code>[alias]
-    check-whitespace = !git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
-</code></pre>
-
-<p>Then running</p>
-
-<pre><code>git check-whitespace
-</code></pre>
-
-<p>can be as easy as running <code>make</code> or <code>git commit</code>.</p>
 ]]></content>
   </entry>
   
