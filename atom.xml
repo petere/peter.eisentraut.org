@@ -4,7 +4,7 @@
   <title><![CDATA[Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2014-12-01T20:28:37-05:00</updated>
+  <updated>2015-01-08T23:33:30-05:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Directing output to multiple files with zsh]]></title>
+    <link href="http://peter.eisentraut.org/blog/2015/01/08/directing-output-to-multiple-files-with-zsh"/>
+    <updated>2015-01-08T20:00:00-05:00</updated>
+    <id>http://peter.eisentraut.org/blog/2015/01/08/directing-output-to-multiple-files-with-zsh</id>
+    <content type="html"><![CDATA[<p>Normally, this doesn&rsquo;t work as one might naively expect:</p>
+
+<pre><code>program &gt; firstfile &gt; secondfile
+</code></pre>
+
+<p>The second redirection will override the first one.  You&rsquo;d have to use
+an external tool to make this work, maybe something like:</p>
+
+<pre><code>program | tee firstfile secondfile
+</code></pre>
+
+<p>But with zsh, this type of thing actually works.  It will duplicate
+the output and write it to multiple files.</p>
+
+<p>This feature also works with a combination of redirections and
+pipes.  For example</p>
+
+<pre><code>ls &gt; foo | grep bar
+</code></pre>
+
+<p>will write the complete directory listing into file <code>foo</code> <em>and</em> print
+out files matching <code>bar</code> to the terminal.</p>
+
+<p>That&rsquo;s great, but this feature pops up in unexpected places.</p>
+
+<p>I have a shell function that checks whether a given command produces
+any output on stderr:</p>
+
+<pre><code>! myprog "$arg" 2&gt;&amp;1 &gt;/dev/null | grep .
+</code></pre>
+
+<p>The effect of this is:</p>
+
+<ul>
+<li>If no stderr is produced, the exit code is 0.</li>
+<li>If stderr is produced, the exit code is 1 and the stderr is shown.</li>
+</ul>
+
+
+<p>(Note the ordering of <code>2&gt;&amp;1 &gt;/dev/null</code> to redirect stderr to stdout
+and silence the original stdout, as opposed to the more common
+incantation of <code>&gt;/dev/null 2&gt;&amp;1</code>, which silences both stderr and
+stdout.)</p>
+
+<p>The reason for this is that <code>myprog</code> has a bug that causes it to print
+errors but not produce a proper exit status in some cases.</p>
+
+<p>Now how will my little shell function snippet behave under zsh?  Well,
+it&rsquo;s quite confusing at first, but the following happens.  If there is
+stderr output, then only stderr is printed.  If there is no stderr
+output, then stdout is passed through instead.  But that&rsquo;s not what I
+wanted.</p>
+
+<p>This can be reproduced simply:</p>
+
+<pre><code>ls --bogus 2&gt;&amp;1 &gt;/dev/null | grep .
+</code></pre>
+
+<p>prints an error message, as expected, but</p>
+
+<pre><code>ls 2&gt;&amp;1 &gt;/dev/null | grep .
+</code></pre>
+
+<p>prints a directory listing.  That&rsquo;s because zsh redirects stdout to
+<em>both</em> <code>/dev/null</code> and the pipe, which makes the redirection to
+<code>/dev/null</code> pointless.</p>
+
+<p>Note that in bash, the second command prints nothing.</p>
+
+<p>This behavior can be changed by turning off the <code>MULTIOS</code> option (see
+<code>zshmisc</code> man page), and my first instinct was to do that, but options
+are not lexically scoped (I think), so this would break again if the
+option was somehow changed somewhere else.  Also, I think I kind of
+like that option for interactive use.</p>
+
+<p>My workaround is to use a subshell:</p>
+
+<pre><code>! ( myprog "$arg" 2&gt;&amp;1 &gt;/dev/null ) | grep .
+</code></pre>
+
+<p>The long-term fix will probably be to write an external shell script
+in bash or plain POSIX shell.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ccache and clang, part 3]]></title>
