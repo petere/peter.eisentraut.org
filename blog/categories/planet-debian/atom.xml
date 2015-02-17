@@ -4,7 +4,7 @@
   <title><![CDATA[Category: planet debian | Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/blog/categories/planet-debian/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2015-01-08T23:33:30-05:00</updated>
+  <updated>2015-02-16T20:48:13-05:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -12,6 +12,45 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Listing screen sessions on login]]></title>
+    <link href="http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login"/>
+    <updated>2015-02-16T20:00:00-05:00</updated>
+    <id>http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login</id>
+    <content type="html"><![CDATA[<p>There is a lot of helpful information about <code>screen</code> out there, but I
+haven&rsquo;t found anything about this.  I don&rsquo;t want to &ldquo;forget&rdquo; any
+screen sessions, so I&rsquo;d like to be notified when I log into a box and
+there are screens running for me.  Obviously, there is <code>screen -ls</code>,
+but it needs to be wrapped in a bit logic so that it doesn&rsquo;t annoy
+when there is no <code>screen</code> running or even installed.</p>
+
+<p>After perusing the <code>screen</code> man page a little, I came up with this for
+<code>.bash_profile</code> or <code>.zprofile</code>:</p>
+
+<pre><code class="sh">if which screen &gt;/dev/null; then
+    screen -q -ls
+    if [ $? -ge 10 ]; then
+        screen -ls
+    fi
+fi
+</code></pre>
+
+<p>The trick is that <code>-q</code> in conjuction with <code>-ls</code> gives you exit codes
+about the current status of <code>screen</code>.</p>
+
+<p>Here is an example of how this looks in practice:</p>
+
+<pre><code>~$ ssh host
+Last login: Fri Feb 13 11:30:10 2015 from 192.0.2.15
+There is a screen on:
+        31572.pts-0.foobar      (2015-02-15 13.03.21)   (Detached)
+1 Socket in /var/run/screen/S-peter.
+
+peter@host:~$ 
+</code></pre>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Directing output to multiple files with zsh]]></title>
