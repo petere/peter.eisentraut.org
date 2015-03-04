@@ -1,24 +1,107 @@
-<?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: planet postgresql | Peter Eisentraut]]></title>
-  <link href="http://peter.eisentraut.org/blog/categories/planet-postgresql/atom.xml" rel="self"/>
-  <link href="http://peter.eisentraut.org/"/>
-  <updated>2015-03-03T21:23:00-05:00</updated>
-  <id>http://peter.eisentraut.org/</id>
-  <author>
-    <name><![CDATA[Peter Eisentraut]]></name>
-    
-  </author>
-  <generator uri="http://octopress.org/">Octopress</generator>
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>The history of replication in PostgreSQL - Peter Eisentraut</title>
+  <meta name="author" content="Peter Eisentraut">
 
   
-  <entry>
-    <title type="html"><![CDATA[The history of replication in PostgreSQL]]></title>
-    <link href="http://peter.eisentraut.org/blog/2015/03/03/the-history-of-replication-in-postgresql"/>
-    <updated>2015-03-03T20:00:00-05:00</updated>
-    <id>http://peter.eisentraut.org/blog/2015/03/03/the-history-of-replication-in-postgresql</id>
-    <content type="html"><![CDATA[<h2>2001: PostgreSQL 7.1: write-ahead log</h2>
+  <meta name="description" content="2001: PostgreSQL 7.1: write-ahead log PostgreSQL 7.1 introduced the write-ahead log (WAL). Before that
+release, all open data files had to be fsynced &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://peter.eisentraut.org/blog/2015/03/03/the-history-of-replication-in-postgresql">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Peter Eisentraut" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-50941261-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Peter Eisentraut</a></h1>
+  
+    <h2>professional automator</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:peter.eisentraut.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about">About</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">The history of replication in PostgreSQL</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-03T20:00:00-05:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>2001: PostgreSQL 7.1: write-ahead log</h2>
 
 <p>PostgreSQL 7.1 introduced the write-ahead log (WAL).  Before that
 release, all open data files had to be fsynced on every commit, which
@@ -240,201 +323,160 @@ configuration is certainly a common request.  But can we expect major
 leaps on functionality?  Who knows.  At one point, something like hot
 standby was thought to be nearly impossible.  So there might be
 surprises still.</p>
-]]></content>
-  </entry>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
   
-  <entry>
-    <title type="html"><![CDATA[ccache and clang, part 3]]></title>
-    <link href="http://peter.eisentraut.org/blog/2014/12/01/ccache-and-clang-part-3"/>
-    <updated>2014-12-01T20:00:00-05:00</updated>
-    <id>http://peter.eisentraut.org/blog/2014/12/01/ccache-and-clang-part-3</id>
-    <content type="html"><![CDATA[<p>In
-<a href="http://petereisentraut.blogspot.com/2011/05/ccache-and-clang.html">part 1</a>
-and
-<a href="http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html">part 2</a>
-I investigated how to use <code>ccache</code> with <code>clang</code>.  That was more than
-three years ago.</p>
 
-<p>I got an email the other day that
-<a href="https://bugzilla.samba.org/show_bug.cgi?id=8118">ccache bug 8118</a>,
-which I filed while writing part 1, was closed, as ccache 3.2 was
-released.  The
-<a href="https://ccache.samba.org/releasenotes.html#_ccache_3_2">release notes of clang 3.2</a>
-contain several items related to clang.  So it was time to give this
-another look.</p>
+<span class="byline author vcard">Posted by <span class="fn">Peter Eisentraut</span></span>
 
-<p>Basically, the conclusions from part 2 still stand: You cannot use
-<code>ccache</code> with <code>clang</code> without using <code>CCACHE_CPP2</code>.  And it is now
-becoming clear to me that this is an issue that is not going to go
-away, and it&rsquo;s not really even Clang&rsquo;s fault.</p>
-
-<h2>Warnings!</h2>
-
-<p>The problem is that <code>clang</code>&rsquo;s <code>-Wall</code> can cause warnings when
-compiling the <em>preprocessed</em> version of otherwise harmless C code.
-This can be illustrated by this piece of C code:</p>
-
-<pre><code class="c">int
-foo()
-{
-        int *p, *q;
-
-        p = q = 0;
-        p = p;
-        if (p == p)
-                return 1;
-        if ((p == q))
-                return 2;
-        return 0;
-}
-</code></pre>
-
-<p>When compiled by <code>gcc-4.9 -Wall</code>, this gives no warnings.  When
-compiled by <code>clang-3.5 -Wall</code>, this results in
-<code>
-test.c:7:4: warning: explicitly assigning value of variable of type 'int *' to itself [-Wself-assign]
-test.c:8:8: warning: self-comparison always evaluates to true [-Wtautological-compare]
-test.c:10:9: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
-test.c:10:9: note: remove extraneous parentheses around the comparison to silence this warning
-test1.c:10:9: note: use '=' to turn this equality comparison into an assignment
-</code></p>
-
-<p>You wouldn&rsquo;t normally write code like this, but the C preprocessor
-could create code with self-assignments, self-comparisons, extra
-parentheses, and so on.</p>
-
-<p>This example represents the issues I saw when trying to compile
-PostgreSQL 9.4 with <code>ccache</code> and <code>clang</code>; there might be others.</p>
-
-<p>You can address this issue in two ways:</p>
-
-<ol>
-<li><p>Use <code>CCACHE_CPP2</code>, as discussed in part 2.  With ccache 3.2, you
-can now also put this into a configuration file: <code>run_second_cpp =
-true</code> in <code>~/.ccache/ccache.conf</code></p></li>
-<li><p>Turn off the warnings mentioned above: <code>-Wno-parentheses-equality</code>,
-<code>-Wno-tautological-compare</code>, <code>-Wno-self-assign</code> (and any others you
-might find).  One might think that these are actually useful warnings
-that one might want to keep, but GCC doesn&rsquo;t warn about them, and if
-you develop primarily with GCC, your code might contain these issues
-anyway.  In particular, I have found that <code>-Wno-tautological-compare</code>
-is necessary for legitimate code.</p></li>
-</ol>
+      
 
 
-<p>I think <code>CCACHE_CPP2</code> is the way to go, for two reasons.  Firstly,
-having to add more and more options to turn off warnings is obviously
-somewhat stupid.  Secondly and more importantly, there is nothing
-stopping GCC from adding warnings similar to Clang&rsquo;s that would
-trigger on preprocessed versions of otherwise harmless C code.  Unless
-they come up with a clever way to annotate the preprocessed code to
-the effect of &ldquo;this code might look wrong to you, but it looked OK
-before preprocessing, so don&rsquo;t warn about it&rdquo;, in a way that creates
-<em>no</em> extra warnings and doesn&rsquo;t lose <em>any</em> warnings, I don&rsquo;t think
-this issue can be solved.</p>
-
-<h2>Speed!</h2>
-
-<p>Now the question is, how much would globally setting <code>CCACHE_CPP2</code>
-slow things down?</p>
-
-<p>To test this, I have built PostgreSQL 9.4rc1 with <code>clang-3.5</code> and
-<code>gcc-4.8</code> (not <code>gcc-4.9</code> because it creates some unrelated warnings
-that I don&rsquo;t want to deal with here).  I have set <code>export
-CCACHE_RECACHE=true</code> so that the cache is not read but new cache
-entries are computed.  That way, the overhead of <code>ccache</code> on top of
-the compiler is measured.</p>
-
-<p>Results:</p>
-
-<ul>
-<li><code>clang-3.5</code>
-
-<ul>
-<li>Using <code>ccache</code> is 10% slower than not using it at all.</li>
-<li>Using <code>ccache</code> with <code>CCACHE_CPP2</code> on is another 10% slower.</li>
-</ul>
-</li>
-<li><code>gcc-4.8</code>
-
-<ul>
-<li>Using <code>ccache</code> is 19% slower than not using it at all.</li>
-<li>Using <code>ccache</code> with <code>CCACHE_CPP2</code> is another 9% slower.</li>
-</ul>
-</li>
-</ul>
 
 
-<p>(There different percentages between <code>gcc</code> and <code>clang</code> arise because
-<code>gcc</code> is faster than <code>clang</code> (yes, really, more on that in a future
-post), but the overhead of <code>ccache</code> doesn&rsquo;t change.)</p>
+<time class='entry-date' datetime='2015-03-03T20:00:00-05:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+      
 
-<p>10% or so is not to be dismissed, but let&rsquo;s remember that this applies
-only if there is a cache miss.  If everything is cached, both methods
-do the same thing.  Also, if you use parallel make, the overhead is
-divided by the number of parallel jobs.</p>
-
-<p>With that in mind, I have decided to put the issue to rest for myself
-and have made myself a <code>~/.ccache/ccache.conf</code> containing</p>
-
-<pre><code>run_second_cpp = true
-</code></pre>
-
-<p>Now Clang or any other compiler should run without problems through
-ccache.</p>
-
-<h2>Color!</h2>
-
-<p>There is one more piece of news in the new ccache release: Another
-thing I talked about in part 1 was that <code>ccache</code> will disable the
-colored output of <code>clang</code>, and I suggested workarounds.  This was
-actually fixed in ccache 3.2, so the workarounds are no longer
-necessary, and the above configuration change is really the only thing
-to make Clang work smoothly with ccache.</p>
-]]></content>
-  </entry>
+<span class="categories">
   
-  <entry>
-    <title type="html"><![CDATA[Checking whitespace with Git]]></title>
-    <link href="http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git"/>
-    <updated>2014-11-04T20:00:00-05:00</updated>
-    <id>http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git</id>
-    <content type="html"><![CDATA[<p><a href="http://blog.codinghorror.com/whitespace-the-silent-killer/">Whitespace matters</a>.</p>
-
-<p>Git has support for checking whitespace in patches.  <code>git apply</code> and <code>git am</code> have the option <code>--whitespace</code>, which can be used to warn or error about whitespace errors in the patches about to be applied. <code>git diff</code> has the option <code>--check</code> to check a change for whitespace errors.</p>
-
-<p>But all this assumes that your existing code is cool, and only new changes are candidates for problems.  Curiously, it is a bit hard to use those same tools for going back and checking whether an existing tree satisfies the whitespace rules applied to new patches.</p>
-
-<p>The core of the whitespace checking is in <code>git diff-tree</code>.  With the <code>--check</code> option, you can check the whitespace in the diff between two objects.</p>
-
-<p>But how do you check the whitespace of a tree rather than a diff?  Basically, you want</p>
-
-<pre><code>git diff-tree --check EMPTY HEAD
-</code></pre>
-
-<p>except there is no <code>EMPTY</code>.  But you can compute the hash of an empty Git tree:</p>
-
-<pre><code>git hash-object -t tree /dev/null
-</code></pre>
-
-<p>So the full command is</p>
-
-<pre><code>git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
-</code></pre>
-
-<p>If have this as an alias in my <code>~/.gitconfig</code>:</p>
-
-<pre><code>[alias]
-    check-whitespace = !git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
-</code></pre>
-
-<p>Then running</p>
-
-<pre><code>git check-whitespace
-</code></pre>
-
-<p>can be as easy as running <code>make</code> or <code>git commit</code>.</p>
-]]></content>
-  </entry>
+    <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a>, <a class='category' href='/blog/categories/replication/'>replication</a>
   
-</feed>
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://peter.eisentraut.org/blog/2015/03/03/the-history-of-replication-in-postgresql" data-via="petereisentraut" data-counturl="http://peter.eisentraut.org/blog/2015/03/03/the-history-of-replication-in-postgresql" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/02/16/listing-screen-sessions-on-login" title="Previous Post: Listing screen sessions on login">&laquo; Listing screen sessions on login</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/03/the-history-of-replication-in-postgresql">The history of replication in PostgreSQL</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/16/listing-screen-sessions-on-login">Listing screen sessions on login</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/08/directing-output-to-multiple-files-with-zsh">Directing output to multiple files with zsh</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/12/01/ccache-and-clang-part-3">ccache and clang, part 3</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/11/04/checking-whitespace-with-git">Checking whitespace with Git</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/PeterEisentraut?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Peter Eisentraut -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'peter-eisentraut-org';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://peter.eisentraut.org/blog/2015/03/03/the-history-of-replication-in-postgresql';
+        var disqus_url = 'http://peter.eisentraut.org/blog/2015/03/03/the-history-of-replication-in-postgresql';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Listing screen sessions on login - Peter Eisentraut</title>
+  <title>Category: replication - Peter Eisentraut</title>
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="There is a lot of helpful information about screen out there, but I
-haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &hellip;">
+  <meta name="description" content="Category: replication">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &h
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login">
+  <link rel="canonical" href="http://peter.eisentraut.org/blog/categories/replication">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Peter Eisentraut" type="application/atom+xml">
@@ -78,121 +77,36 @@ haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &h
   <div id="main">
     <div id="content">
       <div>
-<article class="hentry" role="article">
+<article role="article">
   
   <header>
-    
-      <h1 class="entry-title">Listing screen sessions on login</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-16T20:00:00-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
-        
-           | <a href="#disqus_thread"
-             data-disqus-identifier="http://peter.eisentraut.org">Comments</a>
-        
-      </p>
+    <h1 class="entry-title">Category: replication</h1>
     
   </header>
-
-
-<div class="entry-content"><p>There is a lot of helpful information about <code>screen</code> out there, but I
-haven&rsquo;t found anything about this.  I don&rsquo;t want to &ldquo;forget&rdquo; any
-screen sessions, so I&rsquo;d like to be notified when I log into a box and
-there are screens running for me.  Obviously, there is <code>screen -ls</code>,
-but it needs to be wrapped in a bit logic so that it doesn&rsquo;t annoy
-when there is no <code>screen</code> running or even installed.</p>
-
-<p>After perusing the <code>screen</code> man page a little, I came up with this for
-<code>.bash_profile</code> or <code>.zprofile</code>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">if</span> which screen &gt;/dev/null<span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>    screen -q -ls
-</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -ge <span class="m">10</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>        screen -ls
-</span><span class='line'>    <span class="k">fi</span>
-</span><span class='line'><span class="k">fi</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The trick is that <code>-q</code> in conjuction with <code>-ls</code> gives you exit codes
-about the current status of <code>screen</code>.</p>
-
-<p>Here is an example of how this looks in practice:</p>
-
-<pre><code>~$ ssh host
-Last login: Fri Feb 13 11:30:10 2015 from 192.0.2.15
-There is a screen on:
-        31572.pts-0.foobar      (2015-02-15 13.03.21)   (Detached)
-1 Socket in /var/run/screen/S-peter.
-
-peter@host:~$ 
-</code></pre>
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Peter Eisentraut</span></span>
-
-      
+  <div id="blog-archives" class="category">
 
 
 
-
-<time class='entry-date' datetime='2015-02-16T20:00:00-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
-      
-
-<span class="categories">
   
-    <a class='category' href='/blog/categories/planet-debian/'>planet debian</a>, <a class='category' href='/blog/categories/screen/'>screen</a>
+  <h2>2015</h2>
+
+<article>
   
-</span>
+<h1><a href="/blog/2015/03/03/the-history-of-replication-in-postgresql">The history of replication in PostgreSQL</a></h1>
+<time datetime="2015-03-03T20:00:00-05:00" pubdate><span class='month'>Mar</span> <span class='day'>03</span> <span class='year'>2015</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a>, <a class='category' href='/blog/categories/replication/'>replication</a></span>
+</footer>
 
 
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login" data-via="petereisentraut" data-counturl="http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login" >Tweet</a>
-  
-  
-  <div class="g-plusone" data-size="medium"></div>
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2015/01/08/directing-output-to-multiple-files-with-zsh" title="Previous Post: Directing output to multiple files with zsh">&laquo; Directing output to multiple files with zsh</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2015/03/03/the-history-of-replication-in-postgresql" title="Next Post: The history of replication in PostgreSQL">The history of replication in PostgreSQL &raquo;</a>
-      
-    </p>
-  </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  </section>
+
+  
+</article>
 
 </div>
 
@@ -256,10 +170,7 @@ peter@host:~$
       var disqus_shortname = 'peter-eisentraut-org';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login';
-        var disqus_url = 'http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
