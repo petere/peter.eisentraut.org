@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Retrieving PgBouncer statistics via dblink - Peter Eisentraut</title>
+  <meta name="author" content="Peter Eisentraut">
+
+  
+  <meta name="description" content="PgBouncer has a virtual
+database called pgbouncer. If you connect to that you can run
+special SQL-like commands, for example $ psql -p 6432 pgbouncer &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://peter.eisentraut.org/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Peter Eisentraut" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-50941261-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Peter Eisentraut</a></h1>
+  
+    <h2>professional automator</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:peter.eisentraut.org" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about">About</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Retrieving PgBouncer statistics via dblink</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-03-25T20:00:00-04:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="https://wiki.postgresql.org/wiki/PgBouncer">PgBouncer</a> has a virtual
+database called <code>pgbouncer</code>.  If you connect to that you can run
+special SQL-like commands, for example</p>
+
+<pre><code>$ psql -p 6432 pgbouncer
+=# SHOW pools;
+┌─[ RECORD 1 ]───────────┐
+│ database   │ pgbouncer │
+│ user       │ pgbouncer │
+│ cl_active  │ 1         │
+│ cl_waiting │ 0         │
+│ sv_active  │ 0         │
+│ sv_idle    │ 0         │
+│ sv_used    │ 0         │
+│ sv_tested  │ 0         │
+│ sv_login   │ 0         │
+│ maxwait    │ 0         │
+└────────────┴───────────┘
+</code></pre>
+
+<p>This is quite nice, but unfortunately, you cannot run full SQL queries
+against that data.  So you couldn&rsquo;t do something like</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">pgbouncer</span><span class="p">.</span><span class="n">pools</span> <span class="k">WHERE</span> <span class="n">maxwait</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Well, here is a way: From a regular PostgreSQL database, connect to
+PgBouncer using dblink.  For each <code>SHOW</code> command provided by
+PgBouncer, create a view.  Then that SQL query actually works.</p>
+
+<p>But before you start doing that, I have already done that here:</p>
+
+<div><script src='https://gist.github.com/b4e2aa7cb4a073e07630.js?file=pgbouncer-schema.sql'></script>
+<noscript><pre><code>CREATE EXTENSION dblink;
+
+
+-- customize start
+CREATE SERVER pgbouncer FOREIGN DATA WRAPPER dblink_fdw OPTIONS (host &#39;localhost&#39;,
+                                                                 port &#39;6432&#39;,
+                                                                 dbname &#39;pgbouncer&#39;);
+
+CREATE USER MAPPING FOR PUBLIC SERVER pgbouncer OPTIONS (user &#39;pgbouncer&#39;);
+-- customize stop
+
+
+CREATE SCHEMA pgbouncer;
+
+CREATE VIEW pgbouncer.clients AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show clients&#39;) AS _(type text, &quot;user&quot; text, database text, state text, addr text, port int, local_addr text, local_port int, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text);
+
+CREATE VIEW pgbouncer.config AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show config&#39;) AS _(key text, value text, changeable boolean);
+
+CREATE VIEW pgbouncer.databases AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show databases&#39;) AS _(name text, host text, port int, database text, force_user text, pool_size int, reserve_pool int);
+
+CREATE VIEW pgbouncer.lists AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show lists&#39;) AS _(list text, items int);
+
+CREATE VIEW pgbouncer.pools AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show pools&#39;) AS _(database text, &quot;user&quot; text, cl_active int, cl_waiting int, sv_active int, sv_idle int, sv_used int, sv_tested int, sv_login int, maxwait int);
+
+CREATE VIEW pgbouncer.servers AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show servers&#39;) AS _(type text, &quot;user&quot; text, database text, state text, addr text, port int, local_addr text, local_port int, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text);
+
+CREATE VIEW pgbouncer.sockets AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show sockets&#39;) AS _(type text, &quot;user&quot; text, database text, state text, addr text, port int, local_addr text, local_port int, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text,
+                                                           recv_pos int, pkt_pos int, pkt_remain int, send_pos int, send_remain int, pkt_avail int, send_avail int);
+</code></pre></noscript></div>
+
+
+<p>Here is another useful example.  If you&rsquo;re tracing back connections
+from the database server through PgBouncer to the client, try this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">pgbouncer</span><span class="p">.</span><span class="n">servers</span> <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">pgbouncer</span><span class="p">.</span><span class="n">clients</span> <span class="k">ON</span> <span class="n">servers</span><span class="p">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">clients</span><span class="p">.</span><span class="n">ptr</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unfortunately, different versions of PgBouncer return a different
+number of columns for some commands.  Then you will need different
+view definitions.  I haven&rsquo;t determined a way to handle that
+elegantly.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Peter Eisentraut</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-03-25T20:00:00-04:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>25</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/dblink/'>dblink</a>, <a class='category' href='/blog/categories/pgbouncer/'>pgbouncer</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://peter.eisentraut.org/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink" data-via="petereisentraut" data-counturl="http://peter.eisentraut.org/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/03/03/the-history-of-replication-in-postgresql" title="Previous Post: The history of replication in PostgreSQL">&laquo; The history of replication in PostgreSQL</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink">Retrieving PgBouncer statistics via dblink</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/03/the-history-of-replication-in-postgresql">The history of replication in PostgreSQL</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/16/listing-screen-sessions-on-login">Listing screen sessions on login</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/01/08/directing-output-to-multiple-files-with-zsh">Directing output to multiple files with zsh</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/12/01/ccache-and-clang-part-3">ccache and clang, part 3</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Twitter</h1>
+  <a class="twitter-timeline" data-dnt="true" href="https://twitter.com/petereisentraut" data-widget-id="577650704002781184">Tweets by @petereisentraut</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+<section class="googleplus googleplus-hidden">
+  <h1>
+    <a href="https://plus.google.com/PeterEisentraut?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Peter Eisentraut -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'peter-eisentraut-org';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://peter.eisentraut.org/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink';
+        var disqus_url = 'http://peter.eisentraut.org/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

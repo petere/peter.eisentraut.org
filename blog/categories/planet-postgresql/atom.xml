@@ -4,7 +4,7 @@
   <title><![CDATA[Category: planet postgresql | Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/blog/categories/planet-postgresql/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2015-03-16T22:02:28-04:00</updated>
+  <updated>2015-03-25T22:16:35-04:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -12,6 +12,95 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Retrieving PgBouncer statistics via dblink]]></title>
+    <link href="http://peter.eisentraut.org/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink"/>
+    <updated>2015-03-25T20:00:00-04:00</updated>
+    <id>http://peter.eisentraut.org/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink</id>
+    <content type="html"><![CDATA[<p><a href="https://wiki.postgresql.org/wiki/PgBouncer">PgBouncer</a> has a virtual
+database called <code>pgbouncer</code>.  If you connect to that you can run
+special SQL-like commands, for example</p>
+
+<pre><code>$ psql -p 6432 pgbouncer
+=# SHOW pools;
+┌─[ RECORD 1 ]───────────┐
+│ database   │ pgbouncer │
+│ user       │ pgbouncer │
+│ cl_active  │ 1         │
+│ cl_waiting │ 0         │
+│ sv_active  │ 0         │
+│ sv_idle    │ 0         │
+│ sv_used    │ 0         │
+│ sv_tested  │ 0         │
+│ sv_login   │ 0         │
+│ maxwait    │ 0         │
+└────────────┴───────────┘
+</code></pre>
+
+<p>This is quite nice, but unfortunately, you cannot run full SQL queries
+against that data.  So you couldn&rsquo;t do something like</p>
+
+<pre><code class="sql">SELECT * FROM pgbouncer.pools WHERE maxwait &gt; 0;
+</code></pre>
+
+<p>Well, here is a way: From a regular PostgreSQL database, connect to
+PgBouncer using dblink.  For each <code>SHOW</code> command provided by
+PgBouncer, create a view.  Then that SQL query actually works.</p>
+
+<p>But before you start doing that, I have already done that here:</p>
+
+<p><div><script src='https://gist.github.com/b4e2aa7cb4a073e07630.js?file=pgbouncer-schema.sql'></script>
+<noscript><pre><code>CREATE EXTENSION dblink;
+
+
+-- customize start
+CREATE SERVER pgbouncer FOREIGN DATA WRAPPER dblink_fdw OPTIONS (host &#39;localhost&#39;,
+                                                                 port &#39;6432&#39;,
+                                                                 dbname &#39;pgbouncer&#39;);
+
+CREATE USER MAPPING FOR PUBLIC SERVER pgbouncer OPTIONS (user &#39;pgbouncer&#39;);
+-- customize stop
+
+
+CREATE SCHEMA pgbouncer;
+
+CREATE VIEW pgbouncer.clients AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show clients&#39;) AS _(type text, &quot;user&quot; text, database text, state text, addr text, port int, local_addr text, local_port int, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text);
+
+CREATE VIEW pgbouncer.config AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show config&#39;) AS _(key text, value text, changeable boolean);
+
+CREATE VIEW pgbouncer.databases AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show databases&#39;) AS _(name text, host text, port int, database text, force_user text, pool_size int, reserve_pool int);
+
+CREATE VIEW pgbouncer.lists AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show lists&#39;) AS _(list text, items int);
+
+CREATE VIEW pgbouncer.pools AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show pools&#39;) AS _(database text, &quot;user&quot; text, cl_active int, cl_waiting int, sv_active int, sv_idle int, sv_used int, sv_tested int, sv_login int, maxwait int);
+
+CREATE VIEW pgbouncer.servers AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show servers&#39;) AS _(type text, &quot;user&quot; text, database text, state text, addr text, port int, local_addr text, local_port int, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text);
+
+CREATE VIEW pgbouncer.sockets AS
+    SELECT * FROM dblink(&#39;pgbouncer&#39;, &#39;show sockets&#39;) AS _(type text, &quot;user&quot; text, database text, state text, addr text, port int, local_addr text, local_port int, connect_time timestamp with time zone, request_time timestamp with time zone, ptr text, link text,
+                                                           recv_pos int, pkt_pos int, pkt_remain int, send_pos int, send_remain int, pkt_avail int, send_avail int);
+</code></pre></noscript></div>
+</p>
+
+<p>Here is another useful example.  If you&rsquo;re tracing back connections
+from the database server through PgBouncer to the client, try this:</p>
+
+<pre><code class="sql">SELECT * FROM pgbouncer.servers LEFT JOIN pgbouncer.clients ON servers.link = clients.ptr;
+</code></pre>
+
+<p>Unfortunately, different versions of PgBouncer return a different
+number of columns for some commands.  Then you will need different
+view definitions.  I haven&rsquo;t determined a way to handle that
+elegantly.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The history of replication in PostgreSQL]]></title>
