@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: pguri | Peter Eisentraut]]></title>
+  <link href="http://peter.eisentraut.org/blog/categories/pguri/atom.xml" rel="self"/>
+  <link href="http://peter.eisentraut.org/"/>
+  <updated>2015-04-16T21:51:20-04:00</updated>
+  <id>http://peter.eisentraut.org/</id>
+  <author>
+    <name><![CDATA[Peter Eisentraut]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Storing URIs in PostgreSQL]]></title>
+    <link href="http://peter.eisentraut.org/blog/2015/04/16/storing-uris-in-postgresql"/>
+    <updated>2015-04-16T20:00:00-04:00</updated>
+    <id>http://peter.eisentraut.org/blog/2015/04/16/storing-uris-in-postgresql</id>
+    <content type="html"><![CDATA[<p>About two months ago, this happened:</p>
+
+<blockquote class="twitter-tweet" lang="en"><p>What form of bribery would be required to convince someone to write an `email` and `url` data type for Postgres, by the way? Any takers?</p>&mdash; Peter van Hardenberg (@pvh) <a href="https://twitter.com/pvh/status/567395527357001728">February 16, 2015</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>And a few hours later:</p>
+
+<blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" lang="en"><p><a href="https://twitter.com/pvh">@pvh</a> <a href="https://t.co/NNxHRsHudz">https://t.co/NNxHRsHudz</a></p>&mdash; Peter Eisentraut (@petereisentraut) <a href="https://twitter.com/petereisentraut/status/567902299194073089">February 18, 2015</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>It took a few more hours and days after this to refine some details,
+but I have now tagged the first
+<a href="https://github.com/petere/pguri/releases/tag/1.20150415">release</a> of
+this extension.  Give it a try and let me know what you think.  Bug
+reports and feature requests are welcome.</p>
+
+<p>(I chose to name the data type <code>uri</code> instead of <code>url</code>, as originally
+suggested, because that is more correct and matches what the parsing
+library calls it.  One could create a domain if one prefers the other
+name or if one wants to restrict the values to certain kinds of URIs
+or URLs.)</p>
+
+<p>(If you are interested in storing email addresses,
+<a href="https://wiki.postgresql.org/wiki/Email_address_parsing">here</a> is an
+idea.)</p>
+]]></content>
+  </entry>
+  
+</feed>
