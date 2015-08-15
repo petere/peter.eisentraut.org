@@ -9,7 +9,9 @@
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="About two months ago, this happened: What form of bribery would be required to convince someone to write an `email` and `url` data type for Postgres &hellip;">
+  <meta name="description" content="So I had this PostgreSQL database that was getting a bit too big, and
+since it was really only for analytics, I figured it would be a good
+fit for &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +80,304 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/08/14/have-problems-with-postgresql-try-using-hive">Have problems with PostgreSQL?  Try using Hive!</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-14T20:00:00-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>14</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+        
+           | <a href="/blog/2015/08/14/have-problems-with-postgresql-try-using-hive#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org/blog/2015/08/14/have-problems-with-postgresql-try-using-hive">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>So I had this PostgreSQL database that was getting a bit too big, and
+since it was really only for analytics, I figured it would be a good
+fit for putting in Hadoop+Hive instead.</p>
+
+<p>(For those not completely familiar with this: Hadoop is sort of a job
+tracker and distributed file system. Hive is an SQL-like layer on top
+of that.  I know the cool kids are now using Spark.  Maybe for another
+day.)</p>
+
+<p>The first thing you need to learn about the Hadoop ecosystem is its
+idiosyncratically fragmented structure.  With PostgreSQL, you
+basically have the community website, the community mailing lists, the
+community source code distribution, the community binaries, and a
+handful of binaries made by Linux distributions.  If you search the
+web for a problem with PostgreSQL, you will normally gets hits on one
+or more of: the documentation, the mailing lists, third-party mirrors
+of the mailing lists, or Stack Overflow.  With Hadoop, you have the
+resources provided by the Apache Software Foundation, including the
+source distribution, bug tracker, documentation, and then bunch of
+commercial vendors with their parallel universes, including their own
+mutually incompatible binary distributions, their own copy of the
+documentation, their own mailing lists, their own bug trackers, etc.
+When you search for a problem with Hadoop, you will typically get hits
+from three separate copies of the documentation, about eight mailing
+lists, fifteen tutorials, and one thousand blog posts.  And about 20
+unanswered posts on Stack Overflow.  Different vendors also favor
+different technology extensions.  So if, say, you read that you should
+use some storage method, chances are it&rsquo;s not even supported in a
+given distribution.</p>
+
+<p>The next thing to know is that any information about Hadoop that is
+older than about two years is obsolete.  Because they keep changing
+everything from command names to basic architecture.  Don&rsquo;t even
+bother reading old stuff.  Don&rsquo;t even bother reading anything.</p>
+
+<p>So Hive.  The basic setup is actually fairly well documented.  You set
+up a Hadoop cluster, HDFS, create a few directories.  Getting the
+permissions sorted out during these initial steps is not easy, but it
+seldom is.  So you can create a few tables, load some data, run a few
+queries.</p>
+
+<p>Nevermind that in its default configuration <code>hive</code> spits out about a
+dozen warnings on every startup about deprecated parameters and jar
+file conflicts.  This is apparently well known.  Look around in the
+internet for hive examples.  They show the same output.  Apparently
+the packaged versions of Hadoop and Hive are not tuned for each other.</p>
+
+<p>Then you learn: In the default configuration, there can only be <em>one</em>
+Hive session connected at once.  It doesn&rsquo;t tell you this.  Instead,
+when the second session wants to connect, it tells you</p>
+
+<pre><code>Exception in thread "main" java.lang.RuntimeException: java.lang.RuntimeException: Unable to instantiate org.apache.hadoop.hive.metastore.HiveMetaStoreClient
+</code></pre>
+
+<p>followed by hundreds of lines of exception traces.  This is Hive-speak
+for: &ldquo;there is already one session connected&rdquo;.</p>
+
+<p>You see, Hive needs a, cough, cough, relational database to store its
+schema.  By default, it uses embedded Derby, which allows only one
+connection at a time.  If you want to connect more than one session at
+once, you need to set up an external &ldquo;Hive metastore&rdquo; on a MySQL or
+PostgreSQL database.</p>
+
+<p>Nevermind that Derby can actually run in server mode.  That&rsquo;s
+apparently not supported by Hive.</p>
+
+<p>So I had a PostgreSQL database handy and tried to set that up.  I
+installed the PostgreSQL JDBC driver, created an external database,
+changed the Hive configuration to use an external database.</p>
+
+<p>At this point, it turned out that the PostgreSQL JDBC driver was
+broken, so I had to downgrade to an older version.  (The driver has
+since been fixed.)</p>
+
+<p>After I got one that was working, Hive kept complaining that it
+couldn&rsquo;t find a driver that matches the JDBC URL
+<code>jdbc:postgresql://somehost/hive_metastore</code>.  The PostgreSQL JDBC
+driver explains in detail how to load the driver, but how do I get
+that into Hive?</p>
+
+<p>The first suggestion from the internet was to add something like this
+to <code>.hiverc</code>:</p>
+
+<pre><code>add jar /usr/share/java/postgresql-jdbc.jar;
+</code></pre>
+
+<p>That doesn&rsquo;t work.  Remember, don&rsquo;t believe anything you read on the
+internet.</p>
+
+<p>In between I even tried download the MySQL JDBC driver (no, I don&rsquo;t
+want to sign in with my Oracle account), but it had the same problem.</p>
+
+<p><code>hive</code> is actually a shell script which loads another shell script
+which loads a bunch of other shell scripts, which eventually starts
+<code>java</code>.  After randomly poking around I determined that if I did</p>
+
+<pre><code>export HIVE_AUX_JARS_PATH=/usr/share/java/
+</code></pre>
+
+<p>it would pick up the jar files in that directory.  OK, that worked.</p>
+
+<p>Now I can create tables, load data, run simple queries, from more than
+one session.  So I could do</p>
+
+<pre><code>SELECT * FROM mytable;
+</code></pre>
+
+<p>But as soon as I ran</p>
+
+<pre><code>SELECT count(*) FROM mytable;
+</code></pre>
+
+<p>it crapped out again:</p>
+
+<pre><code>java.io.FileNotFoundException: File does not exist: hdfs://namenode/usr/share/java/jline-0.9.94.jar
+</code></pre>
+
+<p>So it&rsquo;s apparently looking for some jar file on HDFS rather than the
+regular file system.  Some totally unrelated jar file, too.</p>
+
+<p>The difference between the two queries is that the first one is
+answered by just dumping out data locally, whereas the second one
+generates a distributed map-reduce job.  It doesn&rsquo;t tell you that
+beforehand, of course.  Or even afterwards.</p>
+
+<p>After a while I figured that this must have something to do with the
+<code>HIVE_AUX_JARS_PATH</code> setting.  I changed that to</p>
+
+<pre><code>export HIVE_AUX_JARS_PATH=/usr/share/java/postgresql-jdbc.jar;
+</code></pre>
+
+<p>so it would look at only one file, and sure enough it now complains</p>
+
+<pre><code>java.io.FileNotFoundException: File does not exist: hdfs://namenode/usr/share/java/postgresql-jdbc.jar
+</code></pre>
+
+<p>Apparently, the <code>HIVE_AUX_JARS_PATH</code> facility is for adding jars that
+contain user-defined functions that you need at run time.  As far as I
+can tell, there is no separate setting for adding jars that you only
+need locally.</p>
+
+<p>There are workarounds for that on the internet, of varying
+bizarreness, none of which worked.  Remember, don&rsquo;t believe anything
+you read on the internet.</p>
+
+<p>In the end, I indulged it and just uploaded that jar file into HDFS.
+Whatever.</p>
+
+<p>I then put my data loading job into cron, which quickly crapped out
+because <code>JAVA_HOME</code> is not set in the cron environment.  After that
+was fixed, I let my data loading jobs run for a while.</p>
+
+<p>Later, I wanted clear out the previous experiments, drop all tables,
+and start again.  Apparently, dropping a table in Hive takes a very
+long time.  Actually, no.  When you use PostgreSQL for the Hive
+metastore, any attempt to drop a table with <em>hang indefinitely</em>.</p>
+
+<p><a href="https://www.mail-archive.com/user@hive.apache.org/msg00515.html">Someone</a>
+summarized the issue:</p>
+
+<blockquote><p>You are the first person I have heard of using postgres. I commend
+you for not succumbing to the social pressure and just installing
+mysql.  However I would advice succumbing to the social pressure and
+using either derby or mysql.</p>
+
+<p>The reason I say this is because jpox
+&ldquo;has support&rdquo; for a number of data stores (M$ SQL server) however,
+people have run into issues with them. Databases other then derby
+and mysql &lsquo;should work&rsquo; but are generally untested.</p></blockquote>
+
+<p>Not that actually testing it would take much work.  It&rsquo;s not like Hive
+doesn&rsquo;t have any tests.  Just add some tests.</p>
+
+<p>It&rsquo;s funny that they didn&rsquo;t write &ldquo;You are the first person I have
+heard of using hive&rdquo;.  Clearly, nobody has ever actually used this.</p>
+
+<p>Anyway, somehow I ended up creating the metastore schema manually by
+copying and pasting various pieces from the internet and raw files.
+Shudder.</p>
+
+<p>How about more fun?  Here is a run-of-the-mill SQL parse error:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>NoViableAltException(26@[221:1: constant : ( Number | dateLiteral | StringLiteral | stringLiteralSequence | BigintLiteral | SmallintLiteral | TinyintLiteral | DecimalLiteral | charSetStringLiteral | booleanValue );])
+</span><span class='line'>  at org.antlr.runtime.DFA.noViableAlt(DFA.java:158)
+</span><span class='line'>  at org.antlr.runtime.DFA.predict(DFA.java:116)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser_IdentifiersParser.constant(HiveParser_IdentifiersParser.java:4377)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser_IdentifiersParser.partitionVal(HiveParser_IdentifiersParser.java:8444)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser_IdentifiersParser.partitionSpec(HiveParser_IdentifiersParser.java:8283)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser_IdentifiersParser.tableOrPartition(HiveParser_IdentifiersParser.java:8161)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser.tableOrPartition(HiveParser.java:31397)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser.insertClause(HiveParser.java:30914)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser.regular_body(HiveParser.java:29076)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser.queryStatement(HiveParser.java:28968)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser.queryStatementExpression(HiveParser.java:28762)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser.execStatement(HiveParser.java:1238)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.HiveParser.statement(HiveParser.java:938)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.parse.ParseDriver.parse(ParseDriver.java:190)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:424)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.Driver.compile(Driver.java:342)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.Driver.runInternal(Driver.java:1000)
+</span><span class='line'>  at org.apache.hadoop.hive.ql.Driver.run(Driver.java:911)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.processLocalCmd(CliDriver.java:259)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.processCmd(CliDriver.java:216)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.processLine(CliDriver.java:413)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.processLine(CliDriver.java:348)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.processReader(CliDriver.java:446)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.processFile(CliDriver.java:456)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.executeDriver(CliDriver.java:737)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.run(CliDriver.java:675)
+</span><span class='line'>  at org.apache.hadoop.hive.cli.CliDriver.main(CliDriver.java:614)
+</span><span class='line'>  at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+</span><span class='line'>  at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+</span><span class='line'>  at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+</span><span class='line'>  at java.lang.reflect.Method.invoke(Method.java:622)
+</span><span class='line'>  at org.apache.hadoop.util.RunJar.main(RunJar.java:212)
+</span><span class='line'>FAILED: ParseException line 4:20 cannot recognize input near 'year' '(' 'event_timestamp' in constant</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In PostgreSQL, this might say</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>syntax error at or near "("</span></code></pre></td></tr></table></div></figure>
+
+
+<p>with a pointer to the actual query.</p>
+
+<p>I just put a function call somewhere where it didn&rsquo;t belong.  The
+documentation is very terse and confusing about a lot of these things.
+And the documentation is kept as a series of wiki pages.</p>
+
+<p>So now I have a really slow distributed version of my PostgreSQL
+database, which stores its schema in another PostgreSQL database.
+I forgot why I needed that.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -997,6 +1297,10 @@ to make Clang work smoothly with ccache.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/08/14/have-problems-with-postgresql-try-using-hive">Have problems with PostgreSQL?  Try using Hive!</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/04/16/storing-uris-in-postgresql">Storing URIs in PostgreSQL</a>
       </li>
     
@@ -1010,10 +1314,6 @@ to make Clang work smoothly with ccache.</p>
     
       <li class="post">
         <a href="/blog/2015/02/16/listing-screen-sessions-on-login">Listing screen sessions on login</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/01/08/directing-output-to-multiple-files-with-zsh">Directing output to multiple files with zsh</a>
       </li>
     
   </ul>
