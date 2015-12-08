@@ -21,7 +21,7 @@ I got an email the other day that
 [ccache bug 8118](https://bugzilla.samba.org/show_bug.cgi?id=8118),
 which I filed while writing part 1, was closed, as ccache 3.2 was
 released.  The
-[release notes of clang 3.2](https://ccache.samba.org/releasenotes.html#_ccache_3_2)
+[release notes of ccache 3.2](https://ccache.samba.org/releasenotes.html#_ccache_3_2)
 contain several items related to clang.  So it was time to give this
 another look.
 

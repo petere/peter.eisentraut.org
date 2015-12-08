@@ -157,7 +157,7 @@ was fixed, I let my data loading jobs run for a while.
 Later, I wanted clear out the previous experiments, drop all tables,
 and start again.  Apparently, dropping a table in Hive takes a very
 long time.  Actually, no.  When you use PostgreSQL for the Hive
-metastore, any attempt to drop a table with *hang indefinitely*.
+metastore, any attempt to drop a table will *hang indefinitely*.
 
 [Someone](https://www.mail-archive.com/user@hive.apache.org/msg00515.html)
 summarized the issue:
