@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ccache | Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/blog/categories/ccache/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2015-08-15T09:52:09-04:00</updated>
+  <updated>2015-12-07T20:59:12-05:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -29,7 +29,7 @@ three years ago.</p>
 <a href="https://bugzilla.samba.org/show_bug.cgi?id=8118">ccache bug 8118</a>,
 which I filed while writing part 1, was closed, as ccache 3.2 was
 released.  The
-<a href="https://ccache.samba.org/releasenotes.html#_ccache_3_2">release notes of clang 3.2</a>
+<a href="https://ccache.samba.org/releasenotes.html#_ccache_3_2">release notes of ccache 3.2</a>
 contain several items related to clang.  So it was time to give this
 another look.</p>
 

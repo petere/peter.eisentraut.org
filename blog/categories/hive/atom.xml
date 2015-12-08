@@ -4,7 +4,7 @@
   <title><![CDATA[Category: hive | Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/blog/categories/hive/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2015-08-15T09:52:09-04:00</updated>
+  <updated>2015-12-07T20:59:12-05:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -173,7 +173,7 @@ was fixed, I let my data loading jobs run for a while.</p>
 <p>Later, I wanted clear out the previous experiments, drop all tables,
 and start again.  Apparently, dropping a table in Hive takes a very
 long time.  Actually, no.  When you use PostgreSQL for the Hive
-metastore, any attempt to drop a table with <em>hang indefinitely</em>.</p>
+metastore, any attempt to drop a table will <em>hang indefinitely</em>.</p>
 
 <p><a href="https://www.mail-archive.com/user@hive.apache.org/msg00515.html">Someone</a>
 summarized the issue:</p>

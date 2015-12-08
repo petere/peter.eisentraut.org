@@ -257,7 +257,7 @@ was fixed, I let my data loading jobs run for a while.</p>
 <p>Later, I wanted clear out the previous experiments, drop all tables,
 and start again.  Apparently, dropping a table in Hive takes a very
 long time.  Actually, no.  When you use PostgreSQL for the Hive
-metastore, any attempt to drop a table with <em>hang indefinitely</em>.</p>
+metastore, any attempt to drop a table will <em>hang indefinitely</em>.</p>
 
 <p><a href="https://www.mail-archive.com/user@hive.apache.org/msg00515.html">Someone</a>
 summarized the issue:</p>
@@ -412,6 +412,8 @@ I forgot why I needed that.</p>
         <a class="basic-alignment left" href="/blog/2015/04/16/storing-uris-in-postgresql" title="Previous Post: Storing URIs in PostgreSQL">&laquo; Storing URIs in PostgreSQL</a>
       
       
+        <a class="basic-alignment right" href="/blog/2015/12/07/check-your-pg-dump-compression-levels" title="Next Post: Check your pg_dump compression levels">Check your pg_dump compression levels &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -431,6 +433,10 @@ I forgot why I needed that.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/12/07/check-your-pg-dump-compression-levels">Check your pg_dump compression levels</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/08/14/have-problems-with-postgresql-try-using-hive">Have problems with PostgreSQL?  Try using Hive!</a>
       </li>
     
@@ -444,10 +450,6 @@ I forgot why I needed that.</p>
     
       <li class="post">
         <a href="/blog/2015/03/03/the-history-of-replication-in-postgresql">The history of replication in PostgreSQL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/16/listing-screen-sessions-on-login">Listing screen sessions on login</a>
       </li>
     
   </ul>

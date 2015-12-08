@@ -9,9 +9,9 @@
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="So I had this PostgreSQL database that was getting a bit too big, and
-since it was really only for analytics, I figured it would be a good
-fit for &hellip;">
+  <meta name="description" content="I was idly wondering what was taking pg_dump so long and noticed
+that it always seemed to be pegged at 100% CPU usage on the client.
+That was &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -80,6 +80,64 @@ fit for &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/12/07/check-your-pg-dump-compression-levels">Check your pg_dump compression levels</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-12-07T20:00:00-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+        
+           | <a href="/blog/2015/12/07/check-your-pg-dump-compression-levels#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org/blog/2015/12/07/check-your-pg-dump-compression-levels">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I was idly wondering what was taking <code>pg_dump</code> so long and noticed
+that it always seemed to be pegged at 100% CPU usage on the client.
+That was surprising because naively one might think that the
+bottleneck are the server&rsquo;s or the client&rsquo;s disk or the network.
+Profiling quickly revealed that the compression library zlib was
+taking most of the run time on the client.  And indeed, turning
+compression off caused <code>pg_dump</code> to fly without getting anywhere near
+100% CPU.</p>
+
+<p>When using the custom output format in <code>pg_dump</code> (<code>-Fc</code>), the output
+is automatically compressed, using the same default level that <code>gzip</code>
+uses.  By using the option <code>-Z</code>, one can select a compression level
+between 0 (off) and 9 (highest).  Although it is not documented, the
+default corresponds to level 6.</p>
+
+<p>Some simple testing has shown that lowering the level from 6 to 1 can
+speed up the dump run time by a factor of 3 or more while only
+increasing the output size by 10%.  Even the levels in between give
+significant speed increases with only minimal differences in output
+size.  On the other hand, increasing the compression level to 9 only
+decreases the output size by about 1% while causing slow downs by a
+factor of 2.  (In this test, level 1 was about twice as slow as no
+compression, but the output size was about 40% of the uncompressed
+size.  So using at least some compression was still desirable.)</p>
+
+<p>I encourage experimentation with these numbers.  I might actually
+default my scripts to <code>-Z1</code> in the future.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -260,7 +318,7 @@ was fixed, I let my data loading jobs run for a while.</p>
 <p>Later, I wanted clear out the previous experiments, drop all tables,
 and start again.  Apparently, dropping a table in Hive takes a very
 long time.  Actually, no.  When you use PostgreSQL for the Hive
-metastore, any attempt to drop a table with <em>hang indefinitely</em>.</p>
+metastore, any attempt to drop a table will <em>hang indefinitely</em>.</p>
 
 <p><a href="https://www.mail-archive.com/user@hive.apache.org/msg00515.html">Someone</a>
 summarized the issue:</p>
@@ -1027,7 +1085,7 @@ three years ago.</p>
 <a href="https://bugzilla.samba.org/show_bug.cgi?id=8118">ccache bug 8118</a>,
 which I filed while writing part 1, was closed, as ccache 3.2 was
 released.  The
-<a href="https://ccache.samba.org/releasenotes.html#_ccache_3_2">release notes of clang 3.2</a>
+<a href="https://ccache.samba.org/releasenotes.html#_ccache_3_2">release notes of ccache 3.2</a>
 contain several items related to clang.  So it was time to give this
 another look.</p>
 
@@ -1297,6 +1355,10 @@ to make Clang work smoothly with ccache.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/12/07/check-your-pg-dump-compression-levels">Check your pg_dump compression levels</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/08/14/have-problems-with-postgresql-try-using-hive">Have problems with PostgreSQL?  Try using Hive!</a>
       </li>
     
@@ -1310,10 +1372,6 @@ to make Clang work smoothly with ccache.</p>
     
       <li class="post">
         <a href="/blog/2015/03/03/the-history-of-replication-in-postgresql">The history of replication in PostgreSQL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/16/listing-screen-sessions-on-login">Listing screen sessions on login</a>
       </li>
     
   </ul>

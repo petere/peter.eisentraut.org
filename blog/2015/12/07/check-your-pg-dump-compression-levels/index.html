@@ -5,11 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: planet postgresql - Peter Eisentraut</title>
+  <title>Check your pg_dump compression levels - Peter Eisentraut</title>
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="Category: planet postgresql">
+  <meta name="description" content="I was idly wondering what was taking pg_dump so long and noticed
+that it always seemed to be pegged at 100% CPU usage on the client.
+That was &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +20,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://peter.eisentraut.org/blog/categories/planet-postgresql">
+  <link rel="canonical" href="http://peter.eisentraut.org/blog/2015/12/07/check-your-pg-dump-compression-levels">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Peter Eisentraut" type="application/atom+xml">
@@ -77,123 +79,108 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: planet postgresql</h1>
+    
+      <h1 class="entry-title">Check your pg_dump compression levels</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-12-07T20:00:00-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>I was idly wondering what was taking <code>pg_dump</code> so long and noticed
+that it always seemed to be pegged at 100% CPU usage on the client.
+That was surprising because naively one might think that the
+bottleneck are the server&rsquo;s or the client&rsquo;s disk or the network.
+Profiling quickly revealed that the compression library zlib was
+taking most of the run time on the client.  And indeed, turning
+compression off caused <code>pg_dump</code> to fly without getting anywhere near
+100% CPU.</p>
 
-  
-  <h2>2015</h2>
+<p>When using the custom output format in <code>pg_dump</code> (<code>-Fc</code>), the output
+is automatically compressed, using the same default level that <code>gzip</code>
+uses.  By using the option <code>-Z</code>, one can select a compression level
+between 0 (off) and 9 (highest).  Although it is not documented, the
+default corresponds to level 6.</p>
 
-<article>
-  
-<h1><a href="/blog/2015/12/07/check-your-pg-dump-compression-levels">Check your pg_dump compression levels</a></h1>
-<time datetime="2015-12-07T20:00:00-05:00" pubdate><span class='month'>Dec</span> <span class='day'>07</span> <span class='year'>2015</span></time>
+<p>Some simple testing has shown that lowering the level from 6 to 1 can
+speed up the dump run time by a factor of 3 or more while only
+increasing the output size by 10%.  Even the levels in between give
+significant speed increases with only minimal differences in output
+size.  On the other hand, increasing the compression level to 9 only
+decreases the output size by about 1% while causing slow downs by a
+factor of 2.  (In this test, level 1 was about twice as slow as no
+compression, but the output size was about 40% of the uncompressed
+size.  So using at least some compression was still desirable.)</p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/pg-dump/'>pg_dump</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2015/08/14/have-problems-with-postgresql-try-using-hive">Have problems with PostgreSQL?  Try using Hive!</a></h1>
-<time datetime="2015-08-14T20:00:00-04:00" pubdate><span class='month'>Aug</span> <span class='day'>14</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/hadoop/'>hadoop</a>, <a class='category' href='/blog/categories/hive/'>hive</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2015/04/16/storing-uris-in-postgresql">Storing URIs in PostgreSQL</a></h1>
-<time datetime="2015-04-16T20:00:00-04:00" pubdate><span class='month'>Apr</span> <span class='day'>16</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/pguri/'>pguri</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a>, <a class='category' href='/blog/categories/postgresql-extension/'>postgresql extension</a>, <a class='category' href='/blog/categories/uri/'>uri</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink">Retrieving PgBouncer statistics via dblink</a></h1>
-<time datetime="2015-03-25T20:00:00-04:00" pubdate><span class='month'>Mar</span> <span class='day'>25</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/dblink/'>dblink</a>, <a class='category' href='/blog/categories/pgbouncer/'>pgbouncer</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2015/03/03/the-history-of-replication-in-postgresql">The history of replication in PostgreSQL</a></h1>
-<time datetime="2015-03-03T20:00:00-05:00" pubdate><span class='month'>Mar</span> <span class='day'>03</span> <span class='year'>2015</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a>, <a class='category' href='/blog/categories/replication/'>replication</a></span>
-</footer>
-
-
-</article>
-
-
-
-  
-  <h2>2014</h2>
-
-<article>
-  
-<h1><a href="/blog/2014/12/01/ccache-and-clang-part-3">ccache and clang, part 3</a></h1>
-<time datetime="2014-12-01T20:00:00-05:00" pubdate><span class='month'>Dec</span> <span class='day'>01</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/ccache/'>ccache</a>, <a class='category' href='/blog/categories/clang/'>clang</a>, <a class='category' href='/blog/categories/planet-debian/'>planet debian</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2014/11/04/checking-whitespace-with-git">Checking whitespace with Git</a></h1>
-<time datetime="2014-11-04T20:00:00-05:00" pubdate><span class='month'>Nov</span> <span class='day'>04</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/git/'>git</a>, <a class='category' href='/blog/categories/planet-debian/'>planet debian</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a></span>
-</footer>
-
-
-</article>
-
+<p>I encourage experimentation with these numbers.  I might actually
+default my scripts to <code>-Z1</code> in the future.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Peter Eisentraut</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-12-07T20:00:00-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/pg-dump/'>pg_dump</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://peter.eisentraut.org/blog/2015/12/07/check-your-pg-dump-compression-levels" data-via="petereisentraut" data-counturl="http://peter.eisentraut.org/blog/2015/12/07/check-your-pg-dump-compression-levels" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/08/14/have-problems-with-postgresql-try-using-hive" title="Previous Post: Have problems with PostgreSQL?  Try using Hive!">&laquo; Have problems with PostgreSQL?  Try using Hive!</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -262,7 +249,10 @@
       var disqus_shortname = 'peter-eisentraut-org';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://peter.eisentraut.org/blog/2015/12/07/check-your-pg-dump-compression-levels';
+        var disqus_url = 'http://peter.eisentraut.org/blog/2015/12/07/check-your-pg-dump-compression-levels';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
