@@ -4,7 +4,7 @@
   <title><![CDATA[Category: planet debian | Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/blog/categories/planet-debian/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2015-12-07T20:59:12-05:00</updated>
+  <updated>2016-04-11T09:44:16-04:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -12,6 +12,86 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Some git log tweaks]]></title>
+    <link href="http://peter.eisentraut.org/blog/2016/04/11/some-git-log-tweaks"/>
+    <updated>2016-04-11T08:00:00-04:00</updated>
+    <id>http://peter.eisentraut.org/blog/2016/04/11/some-git-log-tweaks</id>
+    <content type="html"><![CDATA[<p>Here are some tweaks to <code>git log</code> that I have found useful.  It might
+depend on the workflow of individual projects how applicable this is.</p>
+
+<p>Git stores separate author and committer information for each commit.
+How these are generated and updated is sometimes mysterious but
+generally makes sense.  For example, if you cherry-pick a commit to a
+different branch, the author information stays the same but the
+committer information is updated.  <code>git log</code> defaults to showing the
+author information.  But I generally care less about that than the
+committer information, because I&rsquo;m usually interested in when the
+commit arrived in my or the public repository, not when it was
+initially thought about.  So let&rsquo;s try to change the default <code>git log</code>
+format to show the committer information instead.  Again, depending on
+the project and the workflow, there can be other preferences.</p>
+
+<p>To create a different default format for <code>git log</code>, first create a new
+format by setting the Git configuration item <code>pretty.somename</code>.  I
+chose <code>pretty.cmedium</code> because it&rsquo;s almost the same as the default
+<code>medium</code> but with the author information replaced by the committer
+information.</p>
+
+<pre><code>[pretty]
+cmedium="format:%C(auto,yellow)commit %H%C(auto,reset)%nCommit:     %cn &lt;%ce&gt;%nCommitDate: %cd%n%n%w(0,4,4)%s%n%+b"
+</code></pre>
+
+<p>Unfortunately, the default <code>git log</code> formats are not defined in terms
+of these placeholders but are hardcoded in the source, so this is my
+best reconstruction using the available means.</p>
+
+<p>You can use this as <code>git log --pretty=cmedium</code>, and you can set this
+as the default using</p>
+
+<pre><code>[format]
+pretty=cmedium
+</code></pre>
+
+<p>If you find this useful and you&rsquo;re the sort of person who is more
+interested in their own timeline than the author&rsquo;s history, you might
+also like two more tweaks.</p>
+
+<p>First, add <code>%cr</code> for relative date, so it looks like</p>
+
+<pre><code>[pretty]
+cmedium="format:%C(auto,yellow)commit %H%C(auto,reset)%nCommit:     %cn &lt;%ce&gt;%nCommitDate: %cd (%cr)%n%n%w(0,4,4)%s%n%+b"
+</code></pre>
+
+<p>This adds a relative designation like &ldquo;2 days ago&rdquo; to the commit date.</p>
+
+<p>Second, set</p>
+
+<pre><code>[log]
+date=local
+</code></pre>
+
+<p>to have all timestamps converted to your local time.</p>
+
+<p>When you put all this together, you turn this</p>
+
+<pre><code>commit e2c117a28f767c9756d2d620929b37651dbe43d1
+Author: Paul Eggert &lt;eggert@cs.ucla.edu&gt;
+Date:   Tue Apr 5 08:16:01 2016 -0700
+</code></pre>
+
+<p>into this</p>
+
+<pre><code>commit e2c117a28f767c9756d2d620929b37651dbe43d1
+Commit:     Paul Eggert &lt;eggert@cs.ucla.edu&gt;
+CommitDate: Tue Apr 5 11:16:01 2016 (3 days ago)
+</code></pre>
+
+<p>PS: If this is lame, there is always this:
+<a href="http://fredkschott.com/post/2014/02/git-log-is-so-2005/">http://fredkschott.com/post/2014/02/git-log-is-so-2005/</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Listing screen sessions on login]]></title>
@@ -173,7 +253,7 @@ away, and it&rsquo;s not really even Clang&rsquo;s fault.</p>
 compiling the <em>preprocessed</em> version of otherwise harmless C code.
 This can be illustrated by this piece of C code:</p>
 
-<pre><code class="c">int
+<pre><code>int
 foo()
 {
         int *p, *q;
