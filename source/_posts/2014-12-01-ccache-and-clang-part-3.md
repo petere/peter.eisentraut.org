@@ -36,7 +36,7 @@ The problem is that `clang`'s `-Wall` can cause warnings when
 compiling the *preprocessed* version of otherwise harmless C code.
 This can be illustrated by this piece of C code:
 
-```c
+```
 int
 foo()
 {
