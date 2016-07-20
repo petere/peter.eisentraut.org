@@ -9,8 +9,9 @@
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="Here are some tweaks to git log that I have found useful. It might
-depend on the workflow of individual projects how applicable this is. Git stores &hellip;">
+  <meta name="description" content="When you are coding in a source tree as big as PostgreSQL&rsquo;s, you will
+at some point want to look into some kind of source code indexing.
+It& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,7 +86,7 @@ depend on the workflow of individual projects how applicable this is. Git stores
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/04/11/some-git-log-tweaks">Some git log tweaks</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/07/20/using-gnu-global-with-postgresql">Using GNU GLOBAL with PostgreSQL</a></h1>
     
     
       <p class="meta">
@@ -94,96 +95,119 @@ depend on the workflow of individual projects how applicable this is. Git stores
 
 
 
-<time class='entry-date' datetime='2016-04-11T08:00:00-04:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 am</span></time>
+<time class='entry-date' datetime='2016-07-20T08:00:00-04:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 am</span></time>
         
-           | <a href="/blog/2016/04/11/some-git-log-tweaks#disqus_thread"
-             data-disqus-identifier="http://peter.eisentraut.org/blog/2016/04/11/some-git-log-tweaks">Comments</a>
+           | <a href="/blog/2016/07/20/using-gnu-global-with-postgresql#disqus_thread"
+             data-disqus-identifier="http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Here are some tweaks to <code>git log</code> that I have found useful.  It might
-depend on the workflow of individual projects how applicable this is.</p>
+  <div class="entry-content"><p>When you are coding in a source tree as big as PostgreSQL&rsquo;s, you will
+at some point want to look into some kind of source code indexing.
+It&rsquo;s often convenient not to bother, since <code>git grep</code> is actually
+superfast.  But when you want to find where a function is defined
+among all the call sites, some more intelligence is useful.</p>
 
-<p>Git stores separate author and committer information for each commit.
-How these are generated and updated is sometimes mysterious but
-generally makes sense.  For example, if you cherry-pick a commit to a
-different branch, the author information stays the same but the
-committer information is updated.  <code>git log</code> defaults to showing the
-author information.  But I generally care less about that than the
-committer information, because I&rsquo;m usually interested in when the
-commit arrived in my or the public repository, not when it was
-initially thought about.  So let&rsquo;s try to change the default <code>git log</code>
-format to show the committer information instead.  Again, depending on
-the project and the workflow, there can be other preferences.</p>
+<p>The traditional tools for this are <code>ctags</code> and <code>etags</code>, which create
+index files intended for use by vi and Emacs, respectively.  The
+PostgreSQL source tree has some customized support for these in the
+tools <code>src/tools/make_ctags</code> and <code>src/tools/make_etags</code>.  Because
+these tools operate on a directory level, those wrapper scripts create
+a single tag file (named <code>tags</code> or <code>TAGS</code> respectively) in the
+top-level directory and symlink it to all the other directories.  This
+allows you to easily look for entries across the entire source tree.
+But it&rsquo;s clearly a hack, and at least Emacs is often somewhat confused
+by this setup.</p>
 
-<p>To create a different default format for <code>git log</code>, first create a new
-format by setting the Git configuration item <code>pretty.somename</code>.  I
-chose <code>pretty.cmedium</code> because it&rsquo;s almost the same as the default
-<code>medium</code> but with the author information replaced by the committer
-information.</p>
+<p>But there is something much better that works very similarly:
+<a href="https://www.gnu.org/software/global/">GNU GLOBAL</a>.  A main difference
+is that GNU GLOBAL works on a project basis not on a directory basis,
+so you don&rsquo;t need to do contortions to create and manage tags files
+all over your source tree.  Also, GLOBAL can be used from the command
+line, so you don&rsquo;t need to be an editor wizard to get started with it.
+Plus, it appears to be much faster.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[pretty]
-</span><span class='line'>cmedium="format:%C(auto,yellow)commit %H%C(auto,reset)%nCommit:     %cn &lt;%ce&gt;%nCommitDate: %cd%n%n%w(0,4,4)%s%n%+b"</span></code></pre></td></tr></table></div></figure>
+<p>The whole thing is very simple.  Install the package, which is usually
+called <code>global</code> and available in most operating system distributions.
+To start, run</p>
 
-
-<p>Unfortunately, the default <code>git log</code> formats are not defined in terms
-of these placeholders but are hardcoded in the source, so this is my
-best reconstruction using the available means.</p>
-
-<p>You can use this as <code>git log --pretty=cmedium</code>, and you can set this
-as the default using</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[format]
-</span><span class='line'>pretty=cmedium</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you find this useful and you&rsquo;re the sort of person who is more
-interested in their own timeline than the author&rsquo;s history, you might
-also like two more tweaks.</p>
-
-<p>First, add <code>%cr</code> for relative date, so it looks like</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[pretty]
-</span><span class='line'>cmedium="format:%C(auto,yellow)commit %H%C(auto,reset)%nCommit:     %cn &lt;%ce&gt;%nCommitDate: %cd (%cr)%n%n%w(0,4,4)%s%n%+b"</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This adds a relative designation like &ldquo;2 days ago&rdquo; to the commit date.</p>
-
-<p>Second, set</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>[log]
-</span><span class='line'>date=local</span></code></pre></td></tr></table></div></figure>
-
-
-<p>to have all timestamps converted to your local time.</p>
-
-<p>When you put all this together, you turn this</p>
-
-<pre><code>commit e2c117a28f767c9756d2d620929b37651dbe43d1
-Author: Paul Eggert &lt;eggert@cs.ucla.edu&gt;
-Date:   Tue Apr 5 08:16:01 2016 -0700
+<pre><code>$ gtags
 </code></pre>
 
-<p>into this</p>
+<p>in the top-level directory.  This creates the files <code>GPATH</code>, <code>GRTAGS</code>,
+and <code>GTAGS</code>.</p>
 
-<pre><code>commit e2c117a28f767c9756d2d620929b37651dbe43d1
-Commit:     Paul Eggert &lt;eggert@cs.ucla.edu&gt;
-CommitDate: Tue Apr 5 11:16:01 2016 (3 days ago)
+<p>Then you can use <code>global</code> to search for stuff, like</p>
+
+<pre><code>$ global elog
+src/include/utils/elog.h
 </code></pre>
 
-<p>PS: If this is lame, there is always this:
-<a href="http://fredkschott.com/post/2014/02/git-log-is-so-2005/">http://fredkschott.com/post/2014/02/git-log-is-so-2005/</a></p>
+<p>Or you can look for places a function is called:</p>
+
+<pre><code>$ global -r write_stderr
+</code></pre>
+
+<p>You can run <code>global</code> in any directory.</p>
+
+<p>Or how about you want to look at the code where something is defined:</p>
+
+<pre><code>$ less -t elog
+</code></pre>
+
+<p>Note no file name is required.  (See the manual for the required setup
+to make this work with <code>less</code>.)</p>
+
+<p>Or of course use editor integration.  For Emacs, there is
+<a href="https://github.com/leoliu/ggtags"><code>ggtags-mode</code></a>.</p>
+
+<p>Here is some fine-tuning for use with the PostgreSQL source tree.
+Generally, I don&rsquo;t want to index generated files.  For example, I
+don&rsquo;t want to see hits in <code>gram.c</code>, only in <code>gram.y</code>.  Plus, you don&rsquo;t
+want to index header files under <code>tmp_install</code>.  (Super annoying when
+you use this to jump to a file to edit and later find that your edits
+have been blown away by <code>make check</code>.)  But when you run <code>gtags</code> in a
+partially built tree, it will index everything it finds.  To fix that,
+I have restricted <code>gtags</code> to only index files that are registered in
+Git, by first running</p>
+
+<pre><code>git ls-files &gt;gtags.files
+</code></pre>
+
+<p>in the top-level directory.  Then <code>gtags</code> will only consider the
+listed files.</p>
+
+<p>This will also improve the workings of the Emacs mode, which will at
+random times call <code>global -u</code> to update the tags.  If it finds a
+<code>gtags.files</code> file, it will observe that and not index random files
+lying around.</p>
+
+<p>I have a shell alias <code>pgconfigure</code> which calls <code>configure</code> with a
+bunch of options for easier typing.  It&rsquo;s basically something like</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pgconfigure<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    ./configure --prefix<span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> .. <span class="o">&amp;&amp;</span> <span class="nb">pwd</span><span class="k">)</span>/pg-install --enable-debug --enable-cassert ...
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At the end I call</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git ls-files &gt;gtags.files
+</span><span class='line'>gtags -i <span class="p">&amp;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>to initialize the source tree for GNU GLOBAL, so it&rsquo;s always
+there.</p>
 </div>
   
   
@@ -1210,7 +1234,7 @@ away, and it&rsquo;s not really even Clang&rsquo;s fault.</p>
 compiling the <em>preprocessed</em> version of otherwise harmless C code.
 This can be illustrated by this piece of C code:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -1223,34 +1247,36 @@ This can be illustrated by this piece of C code:</p>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>int
-</span><span class='line'>foo()
-</span><span class='line'>{
-</span><span class='line'>        int *p, *q;
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span>
+</span><span class='line'><span class="nf">foo</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>        <span class="kt">int</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>        p = q = 0;
-</span><span class='line'>        p = p;
-</span><span class='line'>        if (p == p)
-</span><span class='line'>                return 1;
-</span><span class='line'>        if ((p == q))
-</span><span class='line'>                return 2;
-</span><span class='line'>        return 0;
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="n">p</span> <span class="o">==</span> <span class="n">q</span><span class="p">))</span>
+</span><span class='line'>                <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>When compiled by <code>gcc-4.9 -Wall</code>, this gives no warnings.  When
 compiled by <code>clang-3.5 -Wall</code>, this results in</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>test.c:7:4: warning: explicitly assigning value of variable of type 'int *' to itself [-Wself-assign]
-</span><span class='line'>test.c:8:8: warning: self-comparison always evaluates to true [-Wtautological-compare]
-</span><span class='line'>test.c:10:9: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
-</span><span class='line'>test.c:10:9: note: remove extraneous parentheses around the comparison to silence this warning
-</span><span class='line'>test1.c:10:9: note: use '=' to turn this equality comparison into an assignment</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">7</span><span class="o">:</span><span class="mi">4</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">explicitly</span> <span class="n">assigning</span> <span class="n">value</span> <span class="n">of</span> <span class="n">variable</span> <span class="n">of</span> <span class="n">type</span> <span class="err">&#39;</span><span class="kt">int</span> <span class="o">*</span><span class="err">&#39;</span> <span class="n">to</span> <span class="n">itself</span> <span class="p">[</span><span class="o">-</span><span class="n">Wself</span><span class="o">-</span><span class="n">assign</span><span class="p">]</span>
+</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">8</span><span class="o">:</span><span class="mi">8</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">self</span><span class="o">-</span><span class="n">comparison</span> <span class="n">always</span> <span class="n">evaluates</span> <span class="n">to</span> <span class="nb">true</span> <span class="p">[</span><span class="o">-</span><span class="n">Wtautological</span><span class="o">-</span><span class="n">compare</span><span class="p">]</span>
+</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">equality</span> <span class="n">comparison</span> <span class="n">with</span> <span class="n">extraneous</span> <span class="n">parentheses</span> <span class="p">[</span><span class="o">-</span><span class="n">Wparentheses</span><span class="o">-</span><span class="n">equality</span><span class="p">]</span>
+</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">note</span><span class="p">:</span> <span class="n">remove</span> <span class="n">extraneous</span> <span class="n">parentheses</span> <span class="n">around</span> <span class="n">the</span> <span class="n">comparison</span> <span class="n">to</span> <span class="n">silence</span> <span class="n">this</span> <span class="n">warning</span>
+</span><span class='line'><span class="n">test1</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">note</span><span class="p">:</span> <span class="n">use</span> <span class="sc">&#39;=&#39;</span> <span class="n">to</span> <span class="n">turn</span> <span class="n">this</span> <span class="n">equality</span> <span class="n">comparison</span> <span class="n">into</span> <span class="n">an</span> <span class="n">assignment</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You wouldn&rsquo;t normally write code like this, but the C preprocessor
@@ -1433,7 +1459,7 @@ to make Clang work smoothly with ccache.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/04/11/some-git-log-tweaks">Some git log tweaks</a>
+        <a href="/blog/2016/07/20/using-gnu-global-with-postgresql">Using GNU GLOBAL with PostgreSQL</a>
       </li>
     
       <li class="post">

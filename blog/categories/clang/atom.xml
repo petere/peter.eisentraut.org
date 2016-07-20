@@ -4,7 +4,7 @@
   <title><![CDATA[Category: clang | Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/blog/categories/clang/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2016-04-11T09:44:16-04:00</updated>
+  <updated>2016-07-20T12:30:46-04:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -44,7 +44,7 @@ away, and it&rsquo;s not really even Clang&rsquo;s fault.</p>
 compiling the <em>preprocessed</em> version of otherwise harmless C code.
 This can be illustrated by this piece of C code:</p>
 
-<pre><code>int
+<pre><code class="c">int
 foo()
 {
         int *p, *q;

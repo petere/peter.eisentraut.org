@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: gnu | Peter Eisentraut]]></title>
+  <link href="http://peter.eisentraut.org/blog/categories/gnu/atom.xml" rel="self"/>
+  <link href="http://peter.eisentraut.org/"/>
+  <updated>2016-07-20T12:30:46-04:00</updated>
+  <id>http://peter.eisentraut.org/</id>
+  <author>
+    <name><![CDATA[Peter Eisentraut]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using GNU GLOBAL with PostgreSQL]]></title>
+    <link href="http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql"/>
+    <updated>2016-07-20T08:00:00-04:00</updated>
+    <id>http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql</id>
+    <content type="html"><![CDATA[<p>When you are coding in a source tree as big as PostgreSQL&rsquo;s, you will
+at some point want to look into some kind of source code indexing.
+It&rsquo;s often convenient not to bother, since <code>git grep</code> is actually
+superfast.  But when you want to find where a function is defined
+among all the call sites, some more intelligence is useful.</p>
+
+<p>The traditional tools for this are <code>ctags</code> and <code>etags</code>, which create
+index files intended for use by vi and Emacs, respectively.  The
+PostgreSQL source tree has some customized support for these in the
+tools <code>src/tools/make_ctags</code> and <code>src/tools/make_etags</code>.  Because
+these tools operate on a directory level, those wrapper scripts create
+a single tag file (named <code>tags</code> or <code>TAGS</code> respectively) in the
+top-level directory and symlink it to all the other directories.  This
+allows you to easily look for entries across the entire source tree.
+But it&rsquo;s clearly a hack, and at least Emacs is often somewhat confused
+by this setup.</p>
+
+<p>But there is something much better that works very similarly:
+<a href="https://www.gnu.org/software/global/">GNU GLOBAL</a>.  A main difference
+is that GNU GLOBAL works on a project basis not on a directory basis,
+so you don&rsquo;t need to do contortions to create and manage tags files
+all over your source tree.  Also, GLOBAL can be used from the command
+line, so you don&rsquo;t need to be an editor wizard to get started with it.
+Plus, it appears to be much faster.</p>
+
+<p>The whole thing is very simple.  Install the package, which is usually
+called <code>global</code> and available in most operating system distributions.
+To start, run</p>
+
+<pre><code>$ gtags
+</code></pre>
+
+<p>in the top-level directory.  This creates the files <code>GPATH</code>, <code>GRTAGS</code>,
+and <code>GTAGS</code>.</p>
+
+<p>Then you can use <code>global</code> to search for stuff, like</p>
+
+<pre><code>$ global elog
+src/include/utils/elog.h
+</code></pre>
+
+<p>Or you can look for places a function is called:</p>
+
+<pre><code>$ global -r write_stderr
+</code></pre>
+
+<p>You can run <code>global</code> in any directory.</p>
+
+<p>Or how about you want to look at the code where something is defined:</p>
+
+<pre><code>$ less -t elog
+</code></pre>
+
+<p>Note no file name is required.  (See the manual for the required setup
+to make this work with <code>less</code>.)</p>
+
+<p>Or of course use editor integration.  For Emacs, there is
+<a href="https://github.com/leoliu/ggtags"><code>ggtags-mode</code></a>.</p>
+
+<p>Here is some fine-tuning for use with the PostgreSQL source tree.
+Generally, I don&rsquo;t want to index generated files.  For example, I
+don&rsquo;t want to see hits in <code>gram.c</code>, only in <code>gram.y</code>.  Plus, you don&rsquo;t
+want to index header files under <code>tmp_install</code>.  (Super annoying when
+you use this to jump to a file to edit and later find that your edits
+have been blown away by <code>make check</code>.)  But when you run <code>gtags</code> in a
+partially built tree, it will index everything it finds.  To fix that,
+I have restricted <code>gtags</code> to only index files that are registered in
+Git, by first running</p>
+
+<pre><code>git ls-files &gt;gtags.files
+</code></pre>
+
+<p>in the top-level directory.  Then <code>gtags</code> will only consider the
+listed files.</p>
+
+<p>This will also improve the workings of the Emacs mode, which will at
+random times call <code>global -u</code> to update the tags.  If it finds a
+<code>gtags.files</code> file, it will observe that and not index random files
+lying around.</p>
+
+<p>I have a shell alias <code>pgconfigure</code> which calls <code>configure</code> with a
+bunch of options for easier typing.  It&rsquo;s basically something like</p>
+
+<pre><code class="sh">pgconfigure() {
+    ./configure --prefix=$(cd .. &amp;&amp; pwd)/pg-install --enable-debug --enable-cassert ...
+}
+</code></pre>
+
+<p>At the end I call</p>
+
+<pre><code class="sh">    git ls-files &gt;gtags.files
+    gtags -i &amp;
+</code></pre>
+
+<p>to initialize the source tree for GNU GLOBAL, so it&rsquo;s always
+there.</p>
+]]></content>
+  </entry>
+  
+</feed>

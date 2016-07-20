@@ -5,12 +5,13 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Listing screen sessions on login - Peter Eisentraut</title>
+  <title>Using GNU GLOBAL with PostgreSQL - Peter Eisentraut</title>
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="There is a lot of helpful information about screen out there, but I
-haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &hellip;">
+  <meta name="description" content="When you are coding in a source tree as big as PostgreSQL&rsquo;s, you will
+at some point want to look into some kind of source code indexing.
+It& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +20,7 @@ haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &h
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login">
+  <link rel="canonical" href="http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Peter Eisentraut" type="application/atom+xml">
@@ -82,7 +83,7 @@ haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &h
   
   <header>
     
-      <h1 class="entry-title">Listing screen sessions on login</h1>
+      <h1 class="entry-title">Using GNU GLOBAL with PostgreSQL</h1>
     
     
       <p class="meta">
@@ -91,7 +92,7 @@ haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &h
 
 
 
-<time class='entry-date' datetime='2015-02-16T20:00:00-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+<time class='entry-date' datetime='2016-07-20T08:00:00-04:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 am</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://peter.eisentraut.org">Comments</a>
@@ -101,44 +102,109 @@ haven&rsquo;t found anything about this. I don&rsquo;t want to &ldquo;forget& &h
   </header>
 
 
-<div class="entry-content"><p>There is a lot of helpful information about <code>screen</code> out there, but I
-haven&rsquo;t found anything about this.  I don&rsquo;t want to &ldquo;forget&rdquo; any
-screen sessions, so I&rsquo;d like to be notified when I log into a box and
-there are screens running for me.  Obviously, there is <code>screen -ls</code>,
-but it needs to be wrapped in a bit logic so that it doesn&rsquo;t annoy
-when there is no <code>screen</code> running or even installed.</p>
+<div class="entry-content"><p>When you are coding in a source tree as big as PostgreSQL&rsquo;s, you will
+at some point want to look into some kind of source code indexing.
+It&rsquo;s often convenient not to bother, since <code>git grep</code> is actually
+superfast.  But when you want to find where a function is defined
+among all the call sites, some more intelligence is useful.</p>
 
-<p>After perusing the <code>screen</code> man page a little, I came up with this for
-<code>.bash_profile</code> or <code>.zprofile</code>:</p>
+<p>The traditional tools for this are <code>ctags</code> and <code>etags</code>, which create
+index files intended for use by vi and Emacs, respectively.  The
+PostgreSQL source tree has some customized support for these in the
+tools <code>src/tools/make_ctags</code> and <code>src/tools/make_etags</code>.  Because
+these tools operate on a directory level, those wrapper scripts create
+a single tag file (named <code>tags</code> or <code>TAGS</code> respectively) in the
+top-level directory and symlink it to all the other directories.  This
+allows you to easily look for entries across the entire source tree.
+But it&rsquo;s clearly a hack, and at least Emacs is often somewhat confused
+by this setup.</p>
+
+<p>But there is something much better that works very similarly:
+<a href="https://www.gnu.org/software/global/">GNU GLOBAL</a>.  A main difference
+is that GNU GLOBAL works on a project basis not on a directory basis,
+so you don&rsquo;t need to do contortions to create and manage tags files
+all over your source tree.  Also, GLOBAL can be used from the command
+line, so you don&rsquo;t need to be an editor wizard to get started with it.
+Plus, it appears to be much faster.</p>
+
+<p>The whole thing is very simple.  Install the package, which is usually
+called <code>global</code> and available in most operating system distributions.
+To start, run</p>
+
+<pre><code>$ gtags
+</code></pre>
+
+<p>in the top-level directory.  This creates the files <code>GPATH</code>, <code>GRTAGS</code>,
+and <code>GTAGS</code>.</p>
+
+<p>Then you can use <code>global</code> to search for stuff, like</p>
+
+<pre><code>$ global elog
+src/include/utils/elog.h
+</code></pre>
+
+<p>Or you can look for places a function is called:</p>
+
+<pre><code>$ global -r write_stderr
+</code></pre>
+
+<p>You can run <code>global</code> in any directory.</p>
+
+<p>Or how about you want to look at the code where something is defined:</p>
+
+<pre><code>$ less -t elog
+</code></pre>
+
+<p>Note no file name is required.  (See the manual for the required setup
+to make this work with <code>less</code>.)</p>
+
+<p>Or of course use editor integration.  For Emacs, there is
+<a href="https://github.com/leoliu/ggtags"><code>ggtags-mode</code></a>.</p>
+
+<p>Here is some fine-tuning for use with the PostgreSQL source tree.
+Generally, I don&rsquo;t want to index generated files.  For example, I
+don&rsquo;t want to see hits in <code>gram.c</code>, only in <code>gram.y</code>.  Plus, you don&rsquo;t
+want to index header files under <code>tmp_install</code>.  (Super annoying when
+you use this to jump to a file to edit and later find that your edits
+have been blown away by <code>make check</code>.)  But when you run <code>gtags</code> in a
+partially built tree, it will index everything it finds.  To fix that,
+I have restricted <code>gtags</code> to only index files that are registered in
+Git, by first running</p>
+
+<pre><code>git ls-files &gt;gtags.files
+</code></pre>
+
+<p>in the top-level directory.  Then <code>gtags</code> will only consider the
+listed files.</p>
+
+<p>This will also improve the workings of the Emacs mode, which will at
+random times call <code>global -u</code> to update the tags.  If it finds a
+<code>gtags.files</code> file, it will observe that and not index random files
+lying around.</p>
+
+<p>I have a shell alias <code>pgconfigure</code> which calls <code>configure</code> with a
+bunch of options for easier typing.  It&rsquo;s basically something like</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="k">if</span> which screen &gt;/dev/null<span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>    screen -q -ls
-</span><span class='line'>    <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> -ge <span class="m">10</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-</span><span class='line'>        screen -ls
-</span><span class='line'>    <span class="k">fi</span>
-</span><span class='line'><span class="k">fi</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pgconfigure<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    ./configure --prefix<span class="o">=</span><span class="k">$(</span><span class="nb">cd</span> .. <span class="o">&amp;&amp;</span> <span class="nb">pwd</span><span class="k">)</span>/pg-install --enable-debug --enable-cassert ...
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The trick is that <code>-q</code> in conjuction with <code>-ls</code> gives you exit codes
-about the current status of <code>screen</code>.</p>
+<p>At the end I call</p>
 
-<p>Here is an example of how this looks in practice:</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>git ls-files &gt;gtags.files
+</span><span class='line'>gtags -i <span class="p">&amp;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<pre><code>~$ ssh host
-Last login: Fri Feb 13 11:30:10 2015 from 192.0.2.15
-There is a screen on:
-        31572.pts-0.foobar      (2015-02-15 13.03.21)   (Detached)
-1 Socket in /var/run/screen/S-peter.
 
-peter@host:~$ 
-</code></pre>
+<p>to initialize the source tree for GNU GLOBAL, so it&rsquo;s always
+there.</p>
 </div>
 
 
@@ -154,12 +220,12 @@ peter@host:~$
 
 
 
-<time class='entry-date' datetime='2015-02-16T20:00:00-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>16</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>8:00 pm</span></time>
+<time class='entry-date' datetime='2016-07-20T08:00:00-04:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 am</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/planet-debian/'>planet debian</a>, <a class='category' href='/blog/categories/screen/'>screen</a>
+    <a class='category' href='/blog/categories/global/'>global</a>, <a class='category' href='/blog/categories/gnu/'>gnu</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a>
   
 </span>
 
@@ -168,7 +234,7 @@ peter@host:~$
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login" data-via="petereisentraut" data-counturl="http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql" data-via="petereisentraut" data-counturl="http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -179,10 +245,8 @@ peter@host:~$
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2015/01/08/directing-output-to-multiple-files-with-zsh" title="Previous Post: Directing output to multiple files with zsh">&laquo; Directing output to multiple files with zsh</a>
+        <a class="basic-alignment left" href="/blog/2015/12/07/check-your-pg-dump-compression-levels" title="Previous Post: Check your pg_dump compression levels">&laquo; Check your pg_dump compression levels</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/03/03/the-history-of-replication-in-postgresql" title="Next Post: The history of replication in PostgreSQL">The history of replication in PostgreSQL &raquo;</a>
       
     </p>
   </footer>
@@ -262,8 +326,8 @@ peter@host:~$
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login';
-        var disqus_url = 'http://peter.eisentraut.org/blog/2015/02/16/listing-screen-sessions-on-login';
+        var disqus_identifier = 'http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql';
+        var disqus_url = 'http://peter.eisentraut.org/blog/2016/07/20/using-gnu-global-with-postgresql';
         var disqus_script = 'embed.js';
       
     (function () {

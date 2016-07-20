@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Checking whitespace with Git - Peter Eisentraut</title>
+  <title>Category: global - Peter Eisentraut</title>
   <meta name="author" content="Peter Eisentraut">
 
   
-  <meta name="description" content="Whitespace matters. Git has support for checking whitespace in patches. git apply and git am have the option --whitespace, which can be used to warn &hellip;">
+  <meta name="description" content="Category: global">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git">
+  <link rel="canonical" href="http://peter.eisentraut.org/blog/categories/global">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Peter Eisentraut" type="application/atom+xml">
@@ -77,118 +77,36 @@
   <div id="main">
     <div id="content">
       <div>
-<article class="hentry" role="article">
+<article role="article">
   
   <header>
-    
-      <h1 class="entry-title">Checking whitespace with Git</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-11-04T20:00:00-05:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:00 pm</span></time>
-        
-           | <a href="#disqus_thread"
-             data-disqus-identifier="http://peter.eisentraut.org">Comments</a>
-        
-      </p>
+    <h1 class="entry-title">Category: global</h1>
     
   </header>
-
-
-<div class="entry-content"><p><a href="http://blog.codinghorror.com/whitespace-the-silent-killer/">Whitespace matters</a>.</p>
-
-<p>Git has support for checking whitespace in patches.  <code>git apply</code> and <code>git am</code> have the option <code>--whitespace</code>, which can be used to warn or error about whitespace errors in the patches about to be applied. <code>git diff</code> has the option <code>--check</code> to check a change for whitespace errors.</p>
-
-<p>But all this assumes that your existing code is cool, and only new changes are candidates for problems.  Curiously, it is a bit hard to use those same tools for going back and checking whether an existing tree satisfies the whitespace rules applied to new patches.</p>
-
-<p>The core of the whitespace checking is in <code>git diff-tree</code>.  With the <code>--check</code> option, you can check the whitespace in the diff between two objects.</p>
-
-<p>But how do you check the whitespace of a tree rather than a diff?  Basically, you want</p>
-
-<pre><code>git diff-tree --check EMPTY HEAD
-</code></pre>
-
-<p>except there is no <code>EMPTY</code>.  But you can compute the hash of an empty Git tree:</p>
-
-<pre><code>git hash-object -t tree /dev/null
-</code></pre>
-
-<p>So the full command is</p>
-
-<pre><code>git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
-</code></pre>
-
-<p>If have this as an alias in my <code>~/.gitconfig</code>:</p>
-
-<pre><code>[alias]
-    check-whitespace = !git diff-tree --check $(git hash-object -t tree /dev/null) HEAD
-</code></pre>
-
-<p>Then running</p>
-
-<pre><code>git check-whitespace
-</code></pre>
-
-<p>can be as easy as running <code>make</code> or <code>git commit</code>.</p>
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">Peter Eisentraut</span></span>
-
-      
+  <div id="blog-archives" class="category">
 
 
 
-
-<time class='entry-date' datetime='2014-11-04T20:00:00-05:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>8:00 pm</span></time>
-      
-
-<span class="categories">
   
-    <a class='category' href='/blog/categories/git/'>git</a>, <a class='category' href='/blog/categories/planet-debian/'>planet debian</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>
+  <h2>2016</h2>
+
+<article>
   
-</span>
+<h1><a href="/blog/2016/07/20/using-gnu-global-with-postgresql">Using GNU GLOBAL with PostgreSQL</a></h1>
+<time datetime="2016-07-20T08:00:00-04:00" pubdate><span class='month'>Jul</span> <span class='day'>20</span> <span class='year'>2016</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/global/'>global</a>, <a class='category' href='/blog/categories/gnu/'>gnu</a>, <a class='category' href='/blog/categories/planet-postgresql/'>planet postgresql</a>, <a class='category' href='/blog/categories/postgresql/'>postgresql</a></span>
+</footer>
 
 
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git" data-via="petereisentraut" data-counturl="http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git" >Tweet</a>
-  
-  
-  <div class="g-plusone" data-size="medium"></div>
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2014/10/25/first-post" title="Previous Post: First post">&laquo; First post</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2014/12/01/ccache-and-clang-part-3" title="Next Post: ccache and clang, part 3">ccache and clang, part 3 &raquo;</a>
-      
-    </p>
-  </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  </section>
+
+  
+</article>
 
 </div>
 
@@ -257,10 +175,7 @@
       var disqus_shortname = 'peter-eisentraut-org';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git';
-        var disqus_url = 'http://peter.eisentraut.org/blog/2014/11/04/checking-whitespace-with-git';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
