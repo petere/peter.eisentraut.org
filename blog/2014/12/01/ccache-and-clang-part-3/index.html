@@ -132,7 +132,7 @@ away, and it&rsquo;s not really even Clang&rsquo;s fault.</p>
 compiling the <em>preprocessed</em> version of otherwise harmless C code.
 This can be illustrated by this piece of C code:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -145,36 +145,34 @@ This can be illustrated by this piece of C code:</p>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span>
-</span><span class='line'><span class="nf">foo</span><span class="p">()</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>int
+</span><span class='line'>foo()
+</span><span class='line'>{
+</span><span class='line'>        int *p, *q;
 </span><span class='line'>
-</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
-</span><span class='line'>                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="n">p</span> <span class="o">==</span> <span class="n">q</span><span class="p">))</span>
-</span><span class='line'>                <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>        p = q = 0;
+</span><span class='line'>        p = p;
+</span><span class='line'>        if (p == p)
+</span><span class='line'>                return 1;
+</span><span class='line'>        if ((p == q))
+</span><span class='line'>                return 2;
+</span><span class='line'>        return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
 <p>When compiled by <code>gcc-4.9 -Wall</code>, this gives no warnings.  When
 compiled by <code>clang-3.5 -Wall</code>, this results in</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">7</span><span class="o">:</span><span class="mi">4</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">explicitly</span> <span class="n">assigning</span> <span class="n">value</span> <span class="n">of</span> <span class="n">variable</span> <span class="n">of</span> <span class="n">type</span> <span class="err">&#39;</span><span class="kt">int</span> <span class="o">*</span><span class="err">&#39;</span> <span class="n">to</span> <span class="n">itself</span> <span class="p">[</span><span class="o">-</span><span class="n">Wself</span><span class="o">-</span><span class="n">assign</span><span class="p">]</span>
-</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">8</span><span class="o">:</span><span class="mi">8</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">self</span><span class="o">-</span><span class="n">comparison</span> <span class="n">always</span> <span class="n">evaluates</span> <span class="n">to</span> <span class="nb">true</span> <span class="p">[</span><span class="o">-</span><span class="n">Wtautological</span><span class="o">-</span><span class="n">compare</span><span class="p">]</span>
-</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">equality</span> <span class="n">comparison</span> <span class="n">with</span> <span class="n">extraneous</span> <span class="n">parentheses</span> <span class="p">[</span><span class="o">-</span><span class="n">Wparentheses</span><span class="o">-</span><span class="n">equality</span><span class="p">]</span>
-</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">note</span><span class="p">:</span> <span class="n">remove</span> <span class="n">extraneous</span> <span class="n">parentheses</span> <span class="n">around</span> <span class="n">the</span> <span class="n">comparison</span> <span class="n">to</span> <span class="n">silence</span> <span class="n">this</span> <span class="n">warning</span>
-</span><span class='line'><span class="n">test1</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">note</span><span class="p">:</span> <span class="n">use</span> <span class="sc">&#39;=&#39;</span> <span class="n">to</span> <span class="n">turn</span> <span class="n">this</span> <span class="n">equality</span> <span class="n">comparison</span> <span class="n">into</span> <span class="n">an</span> <span class="n">assignment</span>
-</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>test.c:7:4: warning: explicitly assigning value of variable of type 'int *' to itself [-Wself-assign]
+</span><span class='line'>test.c:8:8: warning: self-comparison always evaluates to true [-Wtautological-compare]
+</span><span class='line'>test.c:10:9: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+</span><span class='line'>test.c:10:9: note: remove extraneous parentheses around the comparison to silence this warning
+</span><span class='line'>test1.c:10:9: note: use '=' to turn this equality comparison into an assignment</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You wouldn&rsquo;t normally write code like this, but the C preprocessor
@@ -337,6 +335,10 @@ to make Clang work smoothly with ccache.</p>
       </li>
     
       <li class="post">
+        <a href="/blog/2016/04/11/some-git-log-tweaks">Some git log tweaks</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/12/07/check-your-pg-dump-compression-levels">Check your pg_dump compression levels</a>
       </li>
     
@@ -346,10 +348,6 @@ to make Clang work smoothly with ccache.</p>
     
       <li class="post">
         <a href="/blog/2015/04/16/storing-uris-in-postgresql">Storing URIs in PostgreSQL</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/03/25/retrieving-pgbouncer-statistics-via-dblink">Retrieving PgBouncer statistics via dblink</a>
       </li>
     
   </ul>

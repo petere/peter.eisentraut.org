@@ -4,7 +4,7 @@
   <title><![CDATA[Peter Eisentraut]]></title>
   <link href="http://peter.eisentraut.org/atom.xml" rel="self"/>
   <link href="http://peter.eisentraut.org/"/>
-  <updated>2016-07-20T12:30:46-04:00</updated>
+  <updated>2016-07-20T12:31:39-04:00</updated>
   <id>http://peter.eisentraut.org/</id>
   <author>
     <name><![CDATA[Peter Eisentraut]]></name>
@@ -121,6 +121,94 @@ bunch of options for easier typing.  It&rsquo;s basically something like</p>
 
 <p>to initialize the source tree for GNU GLOBAL, so it&rsquo;s always
 there.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Some git log tweaks]]></title>
+    <link href="http://peter.eisentraut.org/blog/2016/04/11/some-git-log-tweaks"/>
+    <updated>2016-04-11T08:00:00-04:00</updated>
+    <id>http://peter.eisentraut.org/blog/2016/04/11/some-git-log-tweaks</id>
+    <content type="html"><![CDATA[<p>Here are some tweaks to <code>git log</code> that I have found useful.  It might
+depend on the workflow of individual projects how applicable this is.</p>
+
+<p>Git stores separate author and committer information for each commit.
+How these are generated and updated is sometimes mysterious but
+generally makes sense.  For example, if you cherry-pick a commit to a
+different branch, the author information stays the same but the
+committer information is updated.  <code>git log</code> defaults to showing the
+author information.  But I generally care less about that than the
+committer information, because I&rsquo;m usually interested in when the
+commit arrived in my or the public repository, not when it was
+initially thought about.  So let&rsquo;s try to change the default <code>git log</code>
+format to show the committer information instead.  Again, depending on
+the project and the workflow, there can be other preferences.</p>
+
+<p>To create a different default format for <code>git log</code>, first create a new
+format by setting the Git configuration item <code>pretty.somename</code>.  I
+chose <code>pretty.cmedium</code> because it&rsquo;s almost the same as the default
+<code>medium</code> but with the author information replaced by the committer
+information.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[pretty]
+</span><span class='line'>cmedium="format:%C(auto,yellow)commit %H%C(auto,reset)%nCommit:     %cn &lt;%ce&gt;%nCommitDate: %cd%n%n%w(0,4,4)%s%n%+b"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unfortunately, the default <code>git log</code> formats are not defined in terms
+of these placeholders but are hardcoded in the source, so this is my
+best reconstruction using the available means.</p>
+
+<p>You can use this as <code>git log --pretty=cmedium</code>, and you can set this
+as the default using</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[format]
+</span><span class='line'>pretty=cmedium</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you find this useful and you&rsquo;re the sort of person who is more
+interested in their own timeline than the author&rsquo;s history, you might
+also like two more tweaks.</p>
+
+<p>First, add <code>%cr</code> for relative date, so it looks like</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[pretty]
+</span><span class='line'>cmedium="format:%C(auto,yellow)commit %H%C(auto,reset)%nCommit:     %cn &lt;%ce&gt;%nCommitDate: %cd (%cr)%n%n%w(0,4,4)%s%n%+b"</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This adds a relative designation like &ldquo;2 days ago&rdquo; to the commit date.</p>
+
+<p>Second, set</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[log]
+</span><span class='line'>date=local</span></code></pre></td></tr></table></div></figure>
+
+
+<p>to have all timestamps converted to your local time.</p>
+
+<p>When you put all this together, you turn this</p>
+
+<pre><code>commit e2c117a28f767c9756d2d620929b37651dbe43d1
+Author: Paul Eggert &lt;eggert@cs.ucla.edu&gt;
+Date:   Tue Apr 5 08:16:01 2016 -0700
+</code></pre>
+
+<p>into this</p>
+
+<pre><code>commit e2c117a28f767c9756d2d620929b37651dbe43d1
+Commit:     Paul Eggert &lt;eggert@cs.ucla.edu&gt;
+CommitDate: Tue Apr 5 11:16:01 2016 (3 days ago)
+</code></pre>
+
+<p>PS: If this is lame, there is always this:
+<a href="http://fredkschott.com/post/2014/02/git-log-is-so-2005/">http://fredkschott.com/post/2014/02/git-log-is-so-2005/</a></p>
 ]]></content>
   </entry>
   
@@ -963,7 +1051,7 @@ away, and it&rsquo;s not really even Clang&rsquo;s fault.</p>
 compiling the <em>preprocessed</em> version of otherwise harmless C code.
 This can be illustrated by this piece of C code:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -976,36 +1064,34 @@ This can be illustrated by this piece of C code:</p>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="kt">int</span>
-</span><span class='line'><span class="nf">foo</span><span class="p">()</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>        <span class="kt">int</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="o">*</span><span class="n">q</span><span class="p">;</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>int
+</span><span class='line'>foo()
+</span><span class='line'>{
+</span><span class='line'>        int *p, *q;
 </span><span class='line'>
-</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="n">p</span><span class="p">)</span>
-</span><span class='line'>                <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">((</span><span class="n">p</span> <span class="o">==</span> <span class="n">q</span><span class="p">))</span>
-</span><span class='line'>                <span class="k">return</span> <span class="mi">2</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'>        p = q = 0;
+</span><span class='line'>        p = p;
+</span><span class='line'>        if (p == p)
+</span><span class='line'>                return 1;
+</span><span class='line'>        if ((p == q))
+</span><span class='line'>                return 2;
+</span><span class='line'>        return 0;
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
 
 <p>When compiled by <code>gcc-4.9 -Wall</code>, this gives no warnings.  When
 compiled by <code>clang-3.5 -Wall</code>, this results in</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">7</span><span class="o">:</span><span class="mi">4</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">explicitly</span> <span class="n">assigning</span> <span class="n">value</span> <span class="n">of</span> <span class="n">variable</span> <span class="n">of</span> <span class="n">type</span> <span class="err">&#39;</span><span class="kt">int</span> <span class="o">*</span><span class="err">&#39;</span> <span class="n">to</span> <span class="n">itself</span> <span class="p">[</span><span class="o">-</span><span class="n">Wself</span><span class="o">-</span><span class="n">assign</span><span class="p">]</span>
-</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">8</span><span class="o">:</span><span class="mi">8</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">self</span><span class="o">-</span><span class="n">comparison</span> <span class="n">always</span> <span class="n">evaluates</span> <span class="n">to</span> <span class="nb">true</span> <span class="p">[</span><span class="o">-</span><span class="n">Wtautological</span><span class="o">-</span><span class="n">compare</span><span class="p">]</span>
-</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">warning</span><span class="p">:</span> <span class="n">equality</span> <span class="n">comparison</span> <span class="n">with</span> <span class="n">extraneous</span> <span class="n">parentheses</span> <span class="p">[</span><span class="o">-</span><span class="n">Wparentheses</span><span class="o">-</span><span class="n">equality</span><span class="p">]</span>
-</span><span class='line'><span class="n">test</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">note</span><span class="p">:</span> <span class="n">remove</span> <span class="n">extraneous</span> <span class="n">parentheses</span> <span class="n">around</span> <span class="n">the</span> <span class="n">comparison</span> <span class="n">to</span> <span class="n">silence</span> <span class="n">this</span> <span class="n">warning</span>
-</span><span class='line'><span class="n">test1</span><span class="p">.</span><span class="nl">c</span><span class="p">:</span><span class="mi">10</span><span class="o">:</span><span class="mi">9</span><span class="o">:</span> <span class="nl">note</span><span class="p">:</span> <span class="n">use</span> <span class="sc">&#39;=&#39;</span> <span class="n">to</span> <span class="n">turn</span> <span class="n">this</span> <span class="n">equality</span> <span class="n">comparison</span> <span class="n">into</span> <span class="n">an</span> <span class="n">assignment</span>
-</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>test.c:7:4: warning: explicitly assigning value of variable of type 'int *' to itself [-Wself-assign]
+</span><span class='line'>test.c:8:8: warning: self-comparison always evaluates to true [-Wtautological-compare]
+</span><span class='line'>test.c:10:9: warning: equality comparison with extraneous parentheses [-Wparentheses-equality]
+</span><span class='line'>test.c:10:9: note: remove extraneous parentheses around the comparison to silence this warning
+</span><span class='line'>test1.c:10:9: note: use '=' to turn this equality comparison into an assignment</span></code></pre></td></tr></table></div></figure>
 
 
 <p>You wouldn&rsquo;t normally write code like this, but the C preprocessor
