@@ -13,8 +13,16 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://peter.eisentraut.org" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: petereisentraut
 github_username:  petere
+linkedin_username: petereisentraut
+
+disqus:
+  shortname: peter-eisentraut-org
+
+google_analytics: UA-50941261-1
 
 timezone: America/New_York
+
+show_excerpts: true
 
 # Build settings
 theme: minima
