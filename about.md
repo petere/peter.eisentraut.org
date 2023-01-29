@@ -10,6 +10,6 @@ Hi!  I'm an open source hacker, in the core team of the
 [Debian](https://www.debian.org/) developer, and occasional book
 author.  I work at [EDB](https://www.enterprisedb.com/).
 
-- [Twitter](https://twitter.com/petereisentraut)
+- <a rel="me" href="https://mastodon.social/@petereisentraut">Mastodon</a>
 - [GitHub](https://github.com/petere)
 - [email](mailto:peter@eisentraut.org)
