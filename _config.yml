@@ -8,7 +8,7 @@ title: Peter Eisentraut
 author: Peter Eisentraut
 email: peter@eisentraut.org
 description: >-
-  professional automator
+  Peter Eisentraut's blog
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://peter.eisentraut.org" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: petereisentraut
