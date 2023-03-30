@@ -98,12 +98,12 @@ assigned not one but three values, called weights.  Let's look
 directly at the [DUCET data
 file](https://www.unicode.org/Public/UCA/latest/allkeys.txt):
 
-	0061  ; [.20B3.0020.0002] # LATIN SMALL LETTER A
-	0062  ; [.20CD.0020.0002] # LATIN SMALL LETTER B
-	0063  ; [.20E7.0020.0002] # LATIN SMALL LETTER C
-	0064  ; [.20FD.0020.0002] # LATIN SMALL LETTER D
-	0065  ; [.211A.0020.0002] # LATIN SMALL LETTER E
-	0066  ; [.2155.0020.0002] # LATIN SMALL LETTER F
+	0061  ; [.2075.0020.0002] # LATIN SMALL LETTER A
+	0062  ; [.208F.0020.0002] # LATIN SMALL LETTER B
+	0063  ; [.20A9.0020.0002] # LATIN SMALL LETTER C
+	0064  ; [.20BF.0020.0002] # LATIN SMALL LETTER D
+	0065  ; [.20DB.0020.0002] # LATIN SMALL LETTER E
+	0066  ; [.2116.0020.0002] # LATIN SMALL LETTER F
 
 The numbers on the very left are the Unicode code points (in
 hexadecimal).  The three values in brackets are the weights.  (The
@@ -121,8 +121,8 @@ primary weights from each character in order, then the secondary
 weights, then the tertiary weights, separated by zero words.  So here
 we'd have
 
-	'abc' => 20B3 20CD 20E7 0000 0020 0020 0020 0000 0002 0002 0002
-	'def' => 20FD 211A 2155 0000 0020 0020 0020 0000 0002 0002 0002
+	'abc' => 2075 208F 20A9 0000 0020 0020 0020 0000 0002 0002 0002
+	'def' => 20BF 20DB 2116 0000 0020 0020 0020 0000 0002 0002 0002
 
 This can then be sorted using a normal byte comparison.
 
@@ -138,8 +138,8 @@ principle is the same.
 How does this handle strings of different lengths?  Let's compare
 `abc` and `abcd`:
 
-	'abc'  => 20B3 20CD 20E7 0000 0020 0020 0020 0000 0002 0002 0002
-	'abcd' => 20B3 20CD 20E7 20FD 0000 0020 0020 0020 0020 0000 0002 0002 0002 0002
+	'abc'  => 2075 208F 20A9 0000 0020 0020 0020 0000 0002 0002 0002
+	'abcd' => 2075 208F 20A9 20BF 0000 0020 0020 0020 0020 0000 0002 0002 0002 0002
 
 Because of the zero "divider", this works out that the shorter string
 compares as less, which is what we want.
@@ -149,8 +149,8 @@ compare `äBc` and `déF`.  We look up the weights of the characters:
 
 	00E4  ; [.2075.0020.0002][.0000.002B.0002] # LATIN SMALL LETTER A WITH DIAERESIS
 	0042  ; [.208F.0020.0008] # LATIN CAPITAL LETTER B
-	0063  ; [.20E7.0020.0002] # LATIN SMALL LETTER C
-	0064  ; [.20FD.0020.0002] # LATIN SMALL LETTER D
+	0063  ; [.20A9.0020.0002] # LATIN SMALL LETTER C
+	0064  ; [.20BF.0020.0002] # LATIN SMALL LETTER D
 	00E9  ; [.20DB.0020.0002][.0000.0024.0002] # LATIN SMALL LETTER E WITH ACUTE
 	0046  ; [.2116.0020.0008] # LATIN CAPITAL LETTER F
 
@@ -165,8 +165,8 @@ do with case.
 Let's create the sort keys as before, by concatenating the weights in
 turn, but skipping zero weights:
 
-	'äBc' => 2075 208F 20E7 0000 0020 002B 0020 0020 0000 0002 0008 0002
-	'déF' => 20FD 211A 2155 0000 0020 0020 0024 0020 0000 0002 0002 0008
+	'äBc' => 2075 208F 20A9 0000 0020 002B 0020 0020 0000 0002 0008 0002
+	'déF' => 20BF 20DB 2116 0000 0020 0020 0024 0020 0000 0002 0002 0008
 
 If you compare this, it's actually effectively the same comparison as
 comparing plain `abc` with `def` above, since the comparison is
