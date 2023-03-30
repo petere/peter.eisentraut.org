@@ -81,7 +81,7 @@ for text in multiple languages or if no clear preference is known.
 
 One final acronym: [CLDR](https://cldr.unicode.org/) is the Common
 Locale Data Repository, where many of these customizations are
-maintained (basically, for each language and variant).  This is data
+maintained (basically, for each language and variant).  This data is
 nowadays used by many libraries that provide collation and other
 locale services, such as [ICU](https://icu.unicode.org/) (ok, another
 acronym there).
