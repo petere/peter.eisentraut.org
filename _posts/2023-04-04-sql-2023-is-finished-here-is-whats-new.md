@@ -435,7 +435,7 @@ FROM financial_transactions GRAPH_TABLE (
         -[:ownerof]-> (:account)
         -[t:transaction]- (:account)
         <-[:ownerof]- (owner:person|company)
-  COLUMNS (owner.name AS owner_name, t_amount AS amount)
+  COLUMNS (owner.name AS owner_name, t.amount AS amount)
 ) AS ft
 GROUP BY owner_name;
 ```
