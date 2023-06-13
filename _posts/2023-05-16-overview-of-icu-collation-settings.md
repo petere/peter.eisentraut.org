@@ -53,7 +53,7 @@ this article into two to keep it manageable:
   `de-u-co-phonebk`.
 
 In this article, I'm going to look at the parametric settings in more
-detail.  I'll leave the other settings for a future article.
+detail.  I'll leave the other settings for a [future article]({% post_url 2023-06-13-overview-of-icu-collation-settings-part-2 %}).
 
 You can also follow the more technical specification of the parametric
 settings here:
@@ -721,4 +721,4 @@ officially deprecated ones:
 |---------------------------------------|-----|----------------------------------------------------|
 
 As mentioned at the beginning, I will look at the (non-parametric)
-`collation`/`co` settings in another article in the future.
+`collation`/`co` settings in [another article]({% post_url 2023-06-13-overview-of-icu-collation-settings-part-2 %}) in the future.
