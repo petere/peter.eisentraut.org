@@ -28,7 +28,7 @@ are the shapes of the boxes below it?
 Some are okay: Well-known projects with robust communities and
 ecosystems, such as Perl, Python, ICU, LLVM, systemd; those are big
 boxes.  There is also OpenSSL, which in a well-publicized case was at
-point was one of those thin boxes, but that's been rectified.  There
+one point one of those thin boxes, but that's been rectified.  There
 are lz4 and zstd, somewhat new arrivals in the dependencies of
 PostgreSQL, which appear to have active communities in their
 respective GitHub projects.  There is also zlib, which is in
