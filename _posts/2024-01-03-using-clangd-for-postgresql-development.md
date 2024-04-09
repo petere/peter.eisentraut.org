@@ -115,7 +115,7 @@ Now let's look at the actual setup.  What you need:
   can branch out and try other combinations.  (In theory, the GCC
   project could also provide a language server that is based on the
   GCC backend, which would address this issue from their end, but that
-  doesn't exist at the moment.)
+  doesn't exist at the moment.)[^gcc]
 
 Now let's open a file in Emacs with the default configuration (just to
 show that it works out of the box — of course you can keep using your
@@ -198,3 +198,22 @@ box.
 
 Thanks to fellow PostgreSQL contributor Peter Geoghegan for suggesting
 that I try out clangd.
+
+[^gcc]: Update 2024-04-09: I might have misinterpreted the problem I
+	had at the time.  I was using gcc for the compiler and was getting
+	lots of errors from clangd, and I thought this was because of the
+	different command-line options. clangd actually has some smarts to
+	handle options from other compiler families.  The problem I had
+	was caused (or at least surfaced) by the `-Werror` option,
+	activated by `meson setup -Dwerror=true` (which I always use and
+	generally recommend for development).  My workaround for now is a
+	global [clangd configuration file](https://clangd.llvm.org/config)
+	containing
+
+	```yaml
+	CompileFlags:
+	  Remove: -Werror
+	```
+
+	Since there is no point in making warnings fatal in an editor, I
+	think this workaround is generally applicable.
