@@ -41,7 +41,7 @@ projects and companies:
 | [Neon](https://neon.tech/)                    | Apache 2                    |                                                                                                                                                                            | <https://github.com/neondatabase/neon>                                                                                                                  |
 | [Oriole](https://www.orioledata.com/)         | PostgreSQL                  |                                                                                                                                                                            | <https://github.com/orioledb/orioledb>                                                                                                                  |
 | [pgEdge](https://www.pgedge.com/)             | Confluent Community License | actually labeled "[pgEdge Community License Agreement](https://www.pgedge.com/communitylicense)", but it's the same as Confluent                                           | <https://github.com/pgEdge/spock>                                                                                                                       |
-| [Redis](https://redis.io/docs/about/license/) | BSD, SSPL, RSAL             | SSPL and RSAL only for certain add-ons; [information](https://redis.io/docs/about/license/)                                                                                | <https://github.com/redis/redis> (BSD), <https://github.com/RedisInsight/RedisInsight> (SSPL), <https://github.com/redis-stack/redis-stack> (SSPL/RSAL) |
+| [Redis](https://redis.io/docs/about/license/) | ~~BSD~~, SSPL, RSAL             | ~~SSPL and RSAL only for certain add-ons~~[^redis]; [information](https://redis.io/docs/about/license/)                                                                                | <https://github.com/redis/redis> (~~BSD~~), <https://github.com/RedisInsight/RedisInsight> (SSPL), <https://github.com/redis-stack/redis-stack> (SSPL/RSAL) |
 | [Supabase](https://supabase.com/)             | Apache 2                    |                                                                                                                                                                            | <https://github.com/supabase/supabase>                                                                                                                  |
 | [Timescale](https://www.timescale.com/)       | TSL, Apache 2               | [information](https://docs.timescale.com/about/latest/timescaledb-editions/); note that the "Community Edition" is the TSL (non-open-source) one                           | <https://github.com/timescale/timescaledb>                                                                                                              |
 
@@ -184,3 +184,10 @@ Obviously, the issue here is that a lot of people don't like these new
 But at least there is some emergent standardization happening in this
 space, so that you only have to know a handful of licenses to
 understand what you are getting.
+
+
+[^redis]: Update 2024-05-15: With the Redis [licensing
+	change](https://redis.io/blog/redis-adopts-dual-source-available-licensing/)
+	announced on 2024-03-20, SSPL and RSAL now govern everything,
+	including the core, and the BSD license is no longer used.  I kept
+	my original entry in place but struck through the obsolete parts.
