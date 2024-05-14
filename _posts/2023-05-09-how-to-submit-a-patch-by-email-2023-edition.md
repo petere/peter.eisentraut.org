@@ -61,7 +61,7 @@ $ git format-patch master
 ```
 
 Exactly how to split up a submission into commits sensibly is perhaps
-the subject of another article, but in general it's something that is
+the subject of [another article]({% post_url 2024-05-14-when-to-split-patches-for-postgresql %}), but in general it's something that is
 encouraged and welcome.
 
 Note the following features of what `git format-patch` produces:
