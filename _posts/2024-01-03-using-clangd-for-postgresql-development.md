@@ -85,7 +85,7 @@ Now let's look at the actual setup.  What you need:
   need to use clang for the actual compilation of the project, but it
   could help; see below.)
 
-- You need to use Meson for building PostgreSQL.  This reason for that
+- You need to use Meson for building PostgreSQL.  The reason for that
   is as follows.  clangd needs to know how to compile each source
   file, to be able to show warnings etc.  By default, it will assume
   `clang filename.c`, but that usually won't work because it won't
