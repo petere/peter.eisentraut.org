@@ -152,6 +152,10 @@ the above-mentioned "clean" box) is too old to create reproducible
 tarballs.  The latter is what most users and packagers use anyway.  If
 you care about this, avoid the `.tar.gz` for now.
 
+(Update 2024-09-25: This has been addressed for the 17.0 final
+release.  The Git version on the "clean" box was upgraded, and the
+`.tar.gz` tarballs are also reproducible now.)
+
 I think this is progress, if you care about software supply chain
 integrity.  (It's also a relief if you care about maintaining the
 build system.)  There are certainly more things that could be done.
