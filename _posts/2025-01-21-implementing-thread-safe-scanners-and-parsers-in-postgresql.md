@@ -576,7 +576,7 @@ confusing compiler error about `yyg` not being known.
 
 The official way to get access to these variables from outside
 `yylex()` is to use helper functions like `yyget_text()`,
-`yyget_leng()`.  Alternatively, of if you want to avoid an extra
+`yyget_leng()`.  Alternatively, or if you want to avoid an extra
 function call for performance reasons, you could also just copy the
 above definition of `yyg` into your code.  (Or maybe you could
 redefine `yytext` to something like `yyget_text(yyscanner)`?  There
@@ -1305,7 +1305,7 @@ To achieve that, we need to change the declaration of `yylex()` in the
 scanner definition, too.
 
 The facility in Flex for that is different (arguably not as nice).
-You define the macro `YYD_DECL` to be the complete declaration of
+You define the macro `YY_DECL` to be the complete declaration of
 `yylex()`.  So for example
 
 <pre><code>#define YY_DECL int foo_yylex(union YYSTYPE *yylval, \
